@@ -62,6 +62,15 @@ try{
   const me=await api('/api/me',{cookie});assert.equal(me.data.user.username,'牌桌设计师');
   const login=await api('/api/auth/login',{method:'POST',body:{username:'牌桌设计师',password:'correct-horse-2026'}});assert.equal(login.status,200);assert.ok(login.cookie);
 
+  const wrongCurrentPassword=await api('/api/auth/password',{method:'POST',cookie,csrf,body:{currentPassword:'wrong-password-2026',newPassword:'new-correct-horse-2026'}});
+  assert.equal(wrongCurrentPassword.status,401);assert.equal(wrongCurrentPassword.data.error,'CURRENT_PASSWORD_WRONG');
+  const changedPassword=await api('/api/auth/password',{method:'POST',cookie,csrf,body:{currentPassword:'correct-horse-2026',newPassword:'new-correct-horse-2026'}});
+  assert.equal(changedPassword.status,200);assert.equal(changedPassword.data.ok,true);
+  const currentSessionAfterChange=await api('/api/me',{cookie});assert.equal(currentSessionAfterChange.data.user.username,'牌桌设计师');
+  const otherSessionAfterChange=await api('/api/me',{cookie:login.cookie});assert.equal(otherSessionAfterChange.data.user,null);
+  const oldPasswordLogin=await api('/api/auth/login',{method:'POST',body:{username:'牌桌设计师',password:'correct-horse-2026'}});assert.equal(oldPasswordLogin.status,401);assert.equal(oldPasswordLogin.data.error,'INVALID_CREDENTIALS');
+  const newPasswordLogin=await api('/api/auth/login',{method:'POST',body:{username:'牌桌设计师',password:'new-correct-horse-2026'}});assert.equal(newPasswordLogin.status,200);assert.ok(newPasswordLogin.cookie);
+
   const rejectedCsrf=await api('/api/private-cards',{method:'POST',cookie,body:{name:'无效请求',effect:'不应保存',glyph:'×',rarity:'standard',recommendedTiming:'any'}});
   assert.equal(rejectedCsrf.status,403);assert.equal(rejectedCsrf.data.error,'CSRF_REJECTED');
 
@@ -90,8 +99,8 @@ try{
   const threePool=await api('/api/pools',{method:'POST',cookie,csrf,body:{name:'三节点私人池',description:'房间同步测试',nodes:threeNodes,cards:threeCards}});
   assert.equal(threePool.status,201,threePool.data.message);
 
-  const revoked=await connect(login.cookie);revoked.send(JSON.stringify({type:'hello',clientId:'revoked-session'}));
-  const loggedOut=await api('/api/auth/logout',{method:'POST',cookie:login.cookie,csrf:login.data.csrfToken,body:{}});assert.equal(loggedOut.status,200);
+  const revoked=await connect(newPasswordLogin.cookie);revoked.send(JSON.stringify({type:'hello',clientId:'revoked-session'}));
+  const loggedOut=await api('/api/auth/logout',{method:'POST',cookie:newPasswordLogin.cookie,csrf:newPasswordLogin.data.csrfToken,body:{}});assert.equal(loggedOut.status,200);
   const revokedAttempt=await sendAndWait(revoked,{type:'createRoom',password:'123456',poolId:threePool.data.pool.id},message=>message.type==='error');assert.equal(revokedAttempt.code,'LOGIN_REQUIRED');revoked.close();
 
   const second=await api('/api/auth/register',{method:'POST',body:{username:'另一位玩家',password:'another-password-2026'}});
@@ -116,5 +125,5 @@ try{
   const settlement=await sendAndWait(owner,{type:'settle',roundId:third.state.roundId},message=>message.type==='settlement');assert.equal(settlement.triggered,false);
 
   owner.close();visitor.close();
-  console.log(JSON.stringify({registration:true,login:true,csrf:true,revokedSessionBlocked:true,privateIsolation:true,fiveNodes:true,sixNodesRejected:true,privatePoolRoom:true,guestConfigSync:true,nodeOrder:true,noSettlementCardMeansNoTrigger:true}));
+  console.log(JSON.stringify({registration:true,login:true,passwordChange:true,otherSessionsRevoked:true,csrf:true,revokedSessionBlocked:true,privateIsolation:true,fiveNodes:true,sixNodesRejected:true,privatePoolRoom:true,guestConfigSync:true,nodeOrder:true,noSettlementCardMeansNoTrigger:true}));
 }finally{stop();}

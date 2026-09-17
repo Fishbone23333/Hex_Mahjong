@@ -343,6 +343,7 @@ async function handleApi(request,response,pathname){
       return sendJson(response,200,{user,csrfToken:session.csrfToken},{'Set-Cookie':sessionCookie(request,session.token,(session.expiresAt-Date.now())/1000)});
     }
     if(pathname==='/api/auth/logout'&&method==='POST'){const session=requireApiAuth(request);requireApiMutation(request,session);accountStore.logout(parseCookies(request).hex_session||'');return sendJson(response,200,{ok:true},{'Set-Cookie':sessionCookie(request,'',0)});}
+    if(pathname==='/api/auth/password'&&method==='POST'){const session=requireApiAuth(request);requireApiMutation(request,session);const body=await readJsonBody(request),currentPassword=validateAccountPassword(body.currentPassword),newPassword=validateAccountPassword(body.newPassword);if(currentPassword===newPassword)throw problem('PASSWORD_UNCHANGED','新密码不能与当前密码相同。');if(!accountStore.changePassword(session.user.id,currentPassword,newPassword,session.tokenHash))throw problem('CURRENT_PASSWORD_WRONG','当前密码错误。',401);return sendJson(response,200,{ok:true});}
     if(pathname==='/api/studio'&&method==='GET'){const session=requireApiAuth(request);return sendJson(response,200,{user:session.user,csrfToken:session.csrfToken,...apiStudioPayload(session.user.id)});}
 
     const cardMatch=pathname.match(/^\/api\/private-cards(?:\/([A-Za-z0-9_-]+))?$/);
