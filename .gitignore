@@ -1,5 +1,6 @@
 node_modules/
 **/node_modules/
+data/
 
 # Local runtime and browser caches
 artifacts/**/tools/

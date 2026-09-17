@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
   <title>海克斯麻将 · Hex Mahjong</title>
   <style>
     :root{
@@ -223,6 +224,7 @@
     .lobby-shell{width:min(920px,100%);min-width:0;overflow-x:hidden;border:1px solid rgba(118,232,255,.24);border-radius:14px;background:linear-gradient(145deg,rgba(17,37,59,.98),rgba(6,15,27,.98));box-shadow:0 28px 90px rgba(0,0,0,.52);padding:clamp(22px,4vw,42px)}
     .lobby-brand{display:flex;align-items:center;gap:15px;margin-bottom:7px}.lobby-brand-mark{width:46px;height:46px;display:grid;place-items:center;border:1px solid rgba(118,232,255,.7);color:var(--cyan);font:28px Georgia,serif;transform:rotate(45deg);box-shadow:0 0 28px rgba(82,210,255,.22)}.lobby-brand-mark span{transform:rotate(-45deg)}
     .lobby-title{font:400 clamp(27px,5vw,40px)/1.1 Georgia,"Microsoft YaHei",serif;margin:0}.lobby-subtitle{color:var(--muted);font-size:12px;line-height:1.7;margin:14px 0 25px;max-width:650px}
+    .lobby-account-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-10px 0 18px;padding:10px 12px;border:1px solid rgba(249,203,107,.2);border-radius:7px;background:rgba(249,203,107,.05);color:var(--muted);font-size:10px}.lobby-account-bar strong{color:var(--gold)}.lobby-account-link{border:1px solid rgba(249,203,107,.42);border-radius:5px;padding:7px 10px;color:var(--gold);text-decoration:none;white-space:nowrap}.lobby-account-link:hover{border-color:var(--gold);background:rgba(249,203,107,.1)}
     .lobby-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.lobby-panel{border:1px solid var(--line);border-radius:9px;padding:20px;background:rgba(7,18,31,.58)}.lobby-panel h2{font:400 21px Georgia,"Microsoft YaHei",serif;margin:0 0 7px}.lobby-panel p{font-size:11px;color:var(--muted);line-height:1.6;margin:0 0 15px}
     .lobby-form{display:flex;gap:9px;align-items:center}.lobby-form input{min-width:0;flex:1;border:1px solid rgba(142,164,191,.3);border-radius:5px;background:rgba(2,9,17,.72);color:var(--ink);padding:11px 12px;font-size:14px;letter-spacing:.16em;outline:none}.lobby-form input:focus{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(118,232,255,.1)}.lobby-form input::placeholder{letter-spacing:0;color:#61778f}.lobby-primary{border:1px solid rgba(118,232,255,.62);border-radius:5px;background:linear-gradient(135deg,rgba(35,145,180,.48),rgba(26,71,103,.55));color:#eaffff;padding:11px 14px;cursor:pointer;white-space:nowrap;font-size:12px}.lobby-primary:hover{background:linear-gradient(135deg,rgba(43,177,210,.58),rgba(29,87,121,.62));box-shadow:0 0 22px rgba(58,196,236,.18)}.lobby-primary:disabled{opacity:.45;cursor:not-allowed}
     .room-overview{grid-column:1/-1;border:1px solid var(--line);border-radius:9px;padding:20px;background:rgba(7,18,31,.58)}.room-overview-head{display:flex;justify-content:space-between;align-items:end;gap:12px;border-bottom:1px solid var(--line);padding-bottom:13px;margin-bottom:4px}.room-overview h2{font:400 21px Georgia,"Microsoft YaHei",serif;margin:0}.room-overview-head span{color:var(--muted);font-size:11px}.room-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;max-height:225px;overflow:auto;padding-top:10px}.room-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;border:1px solid rgba(142,164,191,.18);border-radius:6px;background:rgba(255,255,255,.025)}.room-row:hover{border-color:rgba(118,232,255,.4);background:rgba(118,232,255,.05)}.room-row-info{min-width:0}.room-row-id{font-size:17px;letter-spacing:.16em;color:var(--gold)}.room-row-meta{margin-top:4px;color:var(--muted);font-size:10px}.room-join-mini{border:1px solid rgba(118,232,255,.35);border-radius:4px;background:rgba(118,232,255,.07);color:var(--cyan);padding:7px 9px;cursor:pointer;font-size:11px;white-space:nowrap}.room-join-mini:hover{background:rgba(118,232,255,.15);border-color:var(--cyan)}.room-empty{padding:20px;text-align:center;color:var(--muted);font-size:11px}.lobby-foot{display:flex;justify-content:space-between;gap:12px;margin-top:17px;color:var(--muted);font-size:10px;line-height:1.6}.lobby-status{color:var(--gold);min-height:17px;font-size:11px;margin-top:14px}.lobby-status.error{color:var(--danger)}
@@ -240,13 +242,13 @@
     .room-card-stats{display:grid;align-content:center;gap:6px;min-width:0;padding:7px 0;border-top:1px solid rgba(156,205,239,.1);border-bottom:1px solid rgba(156,205,239,.1)}.room-stat{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;color:var(--muted);font-size:10px;white-space:nowrap}.room-stat strong{flex:none;color:#dceaf5;font-size:11px;font-weight:500;letter-spacing:.04em}
     .room-join-mini{display:block;width:100%;min-width:0;min-height:34px;padding:8px 10px;overflow:hidden;border-color:rgba(249,203,107,.45);color:var(--gold);background:rgba(249,203,107,.07);font-size:11px;text-overflow:ellipsis}.room-join-mini:hover:not(:disabled){border-color:var(--gold);background:rgba(249,203,107,.15)}.room-join-mini:disabled{cursor:not-allowed;opacity:.55}
     .room-pagination{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}.room-pagination[hidden]{display:none}.room-page-btn{min-width:76px;border:1px solid rgba(118,232,255,.34);border-radius:5px;background:rgba(118,232,255,.06);color:var(--cyan);padding:8px 11px;cursor:pointer;font-size:11px}.room-page-btn:hover:not(:disabled){border-color:var(--cyan);background:rgba(118,232,255,.13)}.room-page-btn:disabled{cursor:not-allowed;opacity:.35}.room-page-indicator{min-width:70px;text-align:center;color:var(--muted);font-size:11px}.room-page-indicator strong{color:var(--gold);font-size:14px;font-weight:600}
-    .room-modal{z-index:60}.room-dialog{width:min(430px,100%);border:1px solid rgba(118,232,255,.3);border-radius:12px;padding:25px;background:linear-gradient(145deg,rgba(17,39,61,.98),rgba(5,14,26,.98));box-shadow:0 26px 85px rgba(0,0,0,.55)}.room-dialog-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:8px}.room-dialog h2{font:400 27px Georgia,"Microsoft YaHei",serif;margin:0}.room-dialog p{color:var(--muted);font-size:11px;line-height:1.6;margin:0 0 20px}.room-dialog-close{width:30px;height:30px;border:1px solid rgba(142,164,191,.3);border-radius:50%;background:rgba(255,255,255,.04);color:var(--muted);cursor:pointer;font-size:18px;line-height:1}.room-dialog-close:hover{border-color:var(--cyan);color:var(--cyan)}.room-modal-form{display:flex;flex-direction:column;gap:11px}.room-modal-form label{color:var(--muted);font-size:10px}.room-modal-form input{width:100%;margin-top:6px;border:1px solid rgba(142,164,191,.3);border-radius:5px;background:rgba(2,9,17,.72);color:var(--ink);padding:12px;font-size:15px;letter-spacing:.16em;outline:none}.room-modal-form input:focus{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(118,232,255,.1)}.room-modal-form input::placeholder{letter-spacing:0;color:#61778f}.room-modal-submit{margin-top:4px;border:1px solid rgba(118,232,255,.58);border-radius:5px;background:linear-gradient(135deg,rgba(35,145,180,.5),rgba(26,71,103,.58));color:#eaffff;padding:12px 14px;cursor:pointer;font-size:12px}.room-modal-submit:hover{background:linear-gradient(135deg,rgba(43,177,210,.62),rgba(29,87,121,.68));box-shadow:0 0 22px rgba(58,196,236,.18)}.room-modal-submit:disabled{opacity:.45;cursor:not-allowed}.room-modal-error{min-height:17px;color:var(--danger);font-size:11px;line-height:1.5}
-    @media(max-width:760px){.lobby-screen{display:block;height:100dvh;padding:8px;overflow:hidden}.lobby-shell{display:flex;flex-direction:column;width:100%;height:calc(100dvh - 16px);min-height:0;margin:0 auto;padding:15px 12px;overflow:hidden}.lobby-brand{flex:none}.lobby-title{font-size:28px}.lobby-subtitle{flex:none;margin:9px 0 12px;font-size:10px;line-height:1.55}.lobby-actions{flex:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:11px}.lobby-action-btn{min-height:90px;padding:11px 12px}.lobby-action-icon{width:29px;height:29px;margin-bottom:8px;font-size:19px}.lobby-action-title{font-size:18px}.lobby-action-desc{margin-top:5px;font-size:9px}.lobby-grid{display:flex;flex:1;min-height:0}.room-overview{display:flex;flex:1;flex-direction:column;min-height:0;padding:11px 10px}.room-overview-head{flex:none;padding-bottom:9px}.room-overview h2{font-size:18px}.room-overview-head span{max-width:42%;font-size:9px}.room-list{flex:1;min-height:0;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:150px;gap:8px;padding-right:2px;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}.room-row{height:150px;min-height:150px;padding:11px;gap:8px}.room-row-id{gap:5px;font-size:8px}.room-row-id strong{font-size:19px;letter-spacing:.1em}.room-state{padding:3px 5px;font-size:8px}.room-card-stats{gap:5px;padding:6px 0}.room-stat{font-size:9px}.room-stat strong{font-size:10px}.room-join-mini{min-height:33px;padding:7px 6px;font-size:10px}.room-pagination{flex:none;gap:8px;margin-top:9px;padding-top:9px}.room-page-btn{min-width:68px;padding:8px}.room-page-indicator{min-width:58px}.lobby-status{flex:none;min-height:14px;margin-top:7px;font-size:9px}.lobby-foot{display:none}.room-badge{padding:6px 7px}.leave-btn{padding:7px 8px!important;font-size:10px!important}}
+    .room-modal{z-index:60}.room-dialog{width:min(430px,100%);border:1px solid rgba(118,232,255,.3);border-radius:12px;padding:25px;background:linear-gradient(145deg,rgba(17,39,61,.98),rgba(5,14,26,.98));box-shadow:0 26px 85px rgba(0,0,0,.55)}.room-dialog-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:8px}.room-dialog h2{font:400 27px Georgia,"Microsoft YaHei",serif;margin:0}.room-dialog p{color:var(--muted);font-size:11px;line-height:1.6;margin:0 0 20px}.room-dialog-close{width:30px;height:30px;border:1px solid rgba(142,164,191,.3);border-radius:50%;background:rgba(255,255,255,.04);color:var(--muted);cursor:pointer;font-size:18px;line-height:1}.room-dialog-close:hover{border-color:var(--cyan);color:var(--cyan)}.room-modal-form{display:flex;flex-direction:column;gap:11px}.room-modal-form label{color:var(--muted);font-size:10px}.room-modal-form input,.room-modal-form select{width:100%;margin-top:6px;border:1px solid rgba(142,164,191,.3);border-radius:5px;background:rgba(2,9,17,.72);color:var(--ink);padding:12px;font-size:15px;outline:none}.room-modal-form input{letter-spacing:.16em}.room-modal-form input:focus,.room-modal-form select:focus{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(118,232,255,.1)}.room-modal-form input::placeholder{letter-spacing:0;color:#61778f}.room-modal-form select{font-size:12px}.room-modal-submit{margin-top:4px;border:1px solid rgba(118,232,255,.58);border-radius:5px;background:linear-gradient(135deg,rgba(35,145,180,.5),rgba(26,71,103,.58));color:#eaffff;padding:12px 14px;cursor:pointer;font-size:12px}.room-modal-submit:hover{background:linear-gradient(135deg,rgba(43,177,210,.62),rgba(29,87,121,.68));box-shadow:0 0 22px rgba(58,196,236,.18)}.room-modal-submit:disabled{opacity:.45;cursor:not-allowed}.room-modal-error{min-height:17px;color:var(--danger);font-size:11px;line-height:1.5}
+    @media(max-width:760px){.lobby-screen{display:block;height:100dvh;padding:8px;overflow:hidden}.lobby-shell{display:flex;flex-direction:column;width:100%;height:calc(100dvh - 16px);min-height:0;margin:0 auto;padding:15px 12px;overflow:hidden}.lobby-brand{flex:none}.lobby-title{font-size:28px}.lobby-subtitle{flex:none;margin:9px 0 10px;font-size:10px;line-height:1.55}.lobby-account-bar{flex:none;margin:0 0 10px;padding:7px 8px}.lobby-account-link{padding:6px 8px}.lobby-actions{flex:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:11px}.lobby-action-btn{min-height:90px;padding:11px 12px}.lobby-action-icon{width:29px;height:29px;margin-bottom:8px;font-size:19px}.lobby-action-title{font-size:18px}.lobby-action-desc{margin-top:5px;font-size:9px}.lobby-grid{display:flex;flex:1;min-height:0}.room-overview{display:flex;flex:1;flex-direction:column;min-height:0;padding:11px 10px}.room-overview-head{flex:none;padding-bottom:9px}.room-overview h2{font-size:18px}.room-overview-head span{max-width:42%;font-size:9px}.room-list{flex:1;min-height:0;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:150px;gap:8px;padding-right:2px;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}.room-row{height:150px;min-height:150px;padding:11px;gap:8px}.room-row-id{gap:5px;font-size:8px}.room-row-id strong{font-size:19px;letter-spacing:.1em}.room-state{padding:3px 5px;font-size:8px}.room-card-stats{gap:5px;padding:6px 0}.room-stat{font-size:9px}.room-stat strong{font-size:10px}.room-join-mini{min-height:33px;padding:7px 6px;font-size:10px}.room-pagination{flex:none;gap:8px;margin-top:9px;padding-top:9px}.room-page-btn{min-width:68px;padding:8px}.room-page-indicator{min-width:58px}.lobby-status{flex:none;min-height:14px;margin-top:7px;font-size:9px}.lobby-foot{display:none}.room-badge{padding:6px 7px}.leave-btn{padding:7px 8px!important;font-size:10px!important}}
     @media(max-width:340px){.room-list{grid-template-columns:1fr}.room-row{height:148px;min-height:148px}.room-row-id strong{font-size:21px}}
     @keyframes cardIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
     @keyframes prismaticShine{0%,100%{background-position:0 0,0 0,0 0,100% 0}50%{background-position:0 0,0 0,0 0,-100% 0}}
     @media(max-width:1120px){.layout{grid-template-columns:210px minmax(0,1fr)}.side-panel{grid-column:1/-1;position:static}.history{max-height:220px;display:grid;grid-template-columns:repeat(2,1fr);gap:0 18px}}
-    @media(max-width:760px){.topbar{padding:0 16px}.brand p,.counter{display:none}.layout{display:block;padding:20px 16px 42px}.left-rail>.phase-panel{display:none}.side-panel{position:static;margin-bottom:18px}.phase-list{display:grid;grid-template-columns:repeat(2,1fr)}.phase{grid-template-columns:27px 1fr;padding:9px 5px}.phase-dot{width:24px;height:24px}.draw-panel{display:block;padding:20px}.draw-action{margin-top:24px}.draw-btn{width:152px;height:152px}.hero{display:block}.hero>.status-pill{display:none}.mobile-phase-panel{display:block;margin-top:15px;padding:10px 8px;border:1px solid rgba(118,232,255,.28);border-radius:10px;background:rgba(8,24,40,.78);box-shadow:0 10px 28px rgba(0,0,0,.22)}.mobile-phase-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.mobile-phase-list .phase{display:flex;min-width:0;align-items:center;justify-content:center;gap:5px;padding:8px 3px;border-radius:6px;text-align:center}.mobile-phase-list .phase-dot{width:20px;height:20px;flex:none;font-size:9px}.mobile-phase-list .phase-name{font-size:10px;white-space:nowrap}.mobile-phase-list .phase-desc{display:none}.active-grid{grid-template-columns:1fr}.history{grid-template-columns:1fr}}
+    @media(max-width:760px){.topbar{padding:0 16px}.brand p,.counter{display:none}.layout{display:block;padding:20px 16px 42px}.left-rail>.phase-panel{display:none}.side-panel{position:static;margin-bottom:18px}.phase-list{display:grid;grid-template-columns:repeat(2,1fr)}.phase{grid-template-columns:27px 1fr;padding:9px 5px}.phase-dot{width:24px;height:24px}.draw-panel{display:block;padding:20px}.draw-action{margin-top:24px}.draw-btn{width:152px;height:152px}.hero{display:block}.hero>.status-pill{display:none}.mobile-phase-panel{display:block;margin-top:15px;padding:9px 7px;border:1px solid rgba(118,232,255,.28);border-radius:10px;background:rgba(8,24,40,.78);box-shadow:0 10px 28px rgba(0,0,0,.22)}.mobile-phase-list{display:grid;grid-template-columns:repeat(var(--phase-count,3),minmax(0,1fr));gap:4px}.mobile-phase-list .phase{display:flex;min-width:0;min-height:51px;align-items:center;justify-content:center;flex-direction:column;gap:4px;padding:6px 2px;border-radius:6px;text-align:center}.mobile-phase-list .phase-dot{width:19px;height:19px;flex:none;font-size:8px}.mobile-phase-list .phase-name{display:block;width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:clamp(7px,2.35vw,10px);line-height:1.15;white-space:nowrap}.mobile-phase-list .phase-desc{display:none}.active-grid{grid-template-columns:1fr}.history{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -325,6 +327,7 @@
     <div class="lobby-shell">
       <div class="lobby-brand"><div class="lobby-brand-mark"><span>✦</span></div><div><div class="eyebrow">Shared field augments</div><h1 class="lobby-title" id="lobbyTitle">进入海克斯麻将</h1></div></div>
       <p class="lobby-subtitle">创建或加入一个房间后，才能查看和抽取本局海克斯。房间内的所有操作会实时同步给同桌玩家。</p>
+      <div class="lobby-account-bar"><span id="accountStatus">游客模式 · 使用官方川麻卡池</span><a class="lobby-account-link" href="./studio.html">账号与卡池工坊</a></div>
       <div class="lobby-actions">
         <button class="lobby-action-btn gold" id="createRoomActionBtn" type="button">
           <span class="lobby-action-icon" aria-hidden="true">＋</span>
@@ -359,6 +362,7 @@
       <p id="roomModalDescription">设置一个 6 位数字密码，系统会自动生成房间号。</p>
       <form class="room-modal-form" id="roomModalForm">
         <label id="roomModalIdLabel" hidden>房间号<input id="roomModalId" inputmode="numeric" autocomplete="off" maxlength="4" pattern="[0-9]{4}" placeholder="4 位房间号"></label>
+        <label id="roomPoolLabel">本局卡池<select id="roomPoolSelect"><option value="">官方川麻卡池</option></select></label>
         <label>房间密码<input id="roomModalPassword" type="password" inputmode="numeric" autocomplete="current-password" maxlength="6" pattern="[0-9]{6}" placeholder="6 位数字密码" required></label>
         <div class="room-modal-error" id="roomModalError" aria-live="polite"></div>
         <button class="room-modal-submit" id="roomModalSubmit" type="submit">创建房间</button>
@@ -388,7 +392,7 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const cards = [
+    const officialCards = [
       {id:"P01",name:"百变财神",tags:["any"],effect:"本局随机指定一种牌面作为万能牌，该牌可以在胡牌时代替任意牌。",scope:"本局",glyph:"✦"},
       {id:"P02",name:"巨人之握",tags:["opening"],effect:"本局基础手牌增加到 16 张，胡牌改为五组面子加一对将牌。",scope:"本局",glyph:"◆",conflictGroups:["hand-size"]},
       {id:"P03",name:"番倍狂潮",tags:["any"],effect:"本局所有操作的番数 ×2。",scope:"本局",glyph:"×"},
@@ -445,14 +449,16 @@
       {id:"R05",name:"没时间废话了",tags:["any"],effect:"本局每个人的回合必须在 7 秒内结束，超时则赔给在场玩家一人一个筹码。",scope:"本局",glyph:"⏱",challenge:true,prismatic:true},
       {id:"R06",name:"败者食尘",tags:["settlement"],effect:"本局损失筹码最多的玩家(们)的结算作废。",scope:"结算奇迹",glyph:"↺",prismatic:true,chance:0.03}
     ];
-    const drawPoolCards=cards.filter(card=>!card.tags?.includes('settlement'));
+    let cards=officialCards.map(card=>({...card,tags:[...(card.tags||[])]}));
+    let drawPoolCards=cards.filter(card=>!card.tags?.includes('settlement'));
 
-    const phases = [
+    const defaultPhases = [
       {id:'opening',name:'开局',desc:'换三张前',title:'开局海克斯',detail:'在换三张之前，翻开第一张场地效果。涉及换牌、定缺和基础配牌的卡牌只会在这里出现。'},
       {id:'firstWin',name:'第一家胡牌',desc:'胡牌结算后',title:'胡牌后海克斯',detail:'第一家胡牌结算后，翻开一张影响下一阶段牌局的效果。'},
       {id:'secondWin',name:'第二家胡牌',desc:'进入后半场',title:'后半场海克斯',detail:'第二家胡牌结算后，翻开最后一张节点效果。'}
     ];
-    const phaseMap = Object.fromEntries(phases.map(p => [p.id,p]));
+    let phases=defaultPhases.map(phase=>({...phase}));
+    let phaseMap = Object.fromEntries(phases.map(p => [p.id,p]));
     const TURN_TIMER_SECONDS=Object.freeze({R05:7,R02:8});
     const ROUND_TIMER_SECONDS=Object.freeze({R03:60});
     let state = {roundId:'',phase:'opening',used:[],active:[],history:[],triggered:[],locked:false,turnTimer:{started:false,endsAt:null,revision:0,cardId:null,durationSeconds:7},roundTimer:{started:false,endsAt:null,revision:0,cardId:null,durationSeconds:60},version:0};
@@ -488,6 +494,35 @@
     let lobbyRooms=[];
     let roomPage=1;
     const artByCard = {};
+    let lobbyAccount={user:null,pools:[]};
+
+    function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
+    function escapeAttr(value){return escapeHtml(value).replace(/`/g,'&#96;');}
+    function cloneCards(source){return (Array.isArray(source)?source:[]).map(card=>({...card,tags:[...(Array.isArray(card.tags)?card.tags:[])]}));}
+    function clonePhases(source){return (Array.isArray(source)?source:[]).map(phase=>({...phase}));}
+    function applyRoomConfig(config){
+      const nextCards=Array.isArray(config?.cards)&&config.cards.length?config.cards:officialCards;
+      const nextPhases=Array.isArray(config?.phases)&&config.phases.length?config.phases:defaultPhases;
+      cards=cloneCards(nextCards);phases=clonePhases(nextPhases);phaseMap=Object.fromEntries(phases.map(phase=>[phase.id,phase]));drawPoolCards=cards.filter(card=>!card.tags?.includes('settlement'));
+      if(!phaseMap[state.phase])state.phase=phases[0]?.id||'opening';
+      mobilePhaseList?.style.setProperty('--phase-count',String(Math.max(1,Math.min(5,phases.length))));
+    }
+    function renderRoomPoolOptions(){
+      const select=$('roomPoolSelect'),selected=select.value;select.replaceChildren();
+      const official=document.createElement('option');official.value='';official.textContent='官方川麻卡池 · 3 个节点';select.append(official);
+      for(const pool of lobbyAccount.pools||[]){const option=document.createElement('option');option.value=pool.id;option.textContent=pool.name+' · '+pool.nodes.length+' 个节点 · '+pool.cards.length+' 张卡';select.append(option);}
+      select.value=[...select.options].some(option=>option.value===selected)?selected:'';
+    }
+    async function loadLobbyAccount(){
+      try{
+        const meResponse=await fetch('./api/me',{credentials:'same-origin'});if(!meResponse.ok)throw new Error('账号状态加载失败');const me=await meResponse.json();
+        if(!me.user){lobbyAccount={user:null,pools:[]};$('accountStatus').textContent='游客模式 · 使用官方川麻卡池';renderRoomPoolOptions();return;}
+        const poolsResponse=await fetch('./api/pools',{credentials:'same-origin'});const poolsData=poolsResponse.ok?await poolsResponse.json():{pools:[]};
+        lobbyAccount={user:me.user,pools:Array.isArray(poolsData.pools)?poolsData.pools:[]};
+        $('accountStatus').replaceChildren(document.createTextNode('账号 '),Object.assign(document.createElement('strong'),{textContent:me.user.username}),document.createTextNode(' · '+lobbyAccount.pools.length+' 个私人卡池'));
+        renderRoomPoolOptions();
+      }catch{lobbyAccount={user:null,pools:[]};$('accountStatus').textContent='账号状态暂不可用 · 仍可使用官方卡池';renderRoomPoolOptions();}
+    }
 
     // 状态以服务器广播为准；保留空函数兼容旧版初始化代码。
     function save(){}
@@ -513,9 +548,9 @@
     function resultMarkup(card){
       const result=card.resolution;
       if(hasHiddenRandomResult(card))return '<div class="card-result"><span class="card-result-label">随机结果 · 待揭晓</span><strong>？？？</strong><small>再次点击这张卡片，揭晓本局的具体结果。</small></div>';
-      if(result?.kind==='wildTile')return '<div class="card-result"><span class="card-result-label">本局万能牌 · 已锁定</span><strong>'+result.tile+'</strong><small>该牌面的四张牌均生效；仅从万、筒、条中抽取。</small></div>';
-      if(result?.kind==='missingSuits')return '<div class="card-result"><span class="card-result-label">本局定缺 · 已锁定</span><div class="card-result-grid">'+result.seats.map(item=>'<span>'+item.seat+'号位 · 缺'+item.suit+'</span>').join('')+'</div><small>庄家为1号位，其余按正常行牌顺序编号。</small></div>';
-      if(result?.kind==='bonusHexes')return '<div class="card-result"><span class="card-result-label">火力全开 · 额外三张</span><div class="card-result-grid">'+result.cards.map(item=>'<span>'+item.name+'</span>').join('')+'</div><small>这三张海克斯与本卡同时生效；本局不再进入后续抽取节点。</small></div>';
+      if(result?.kind==='wildTile')return '<div class="card-result"><span class="card-result-label">本局万能牌 · 已锁定</span><strong>'+escapeHtml(result.tile)+'</strong><small>该牌面的四张牌均生效；仅从万、筒、条中抽取。</small></div>';
+      if(result?.kind==='missingSuits')return '<div class="card-result"><span class="card-result-label">本局定缺 · 已锁定</span><div class="card-result-grid">'+result.seats.map(item=>'<span>'+escapeHtml(item.seat)+'号位 · 缺'+escapeHtml(item.suit)+'</span>').join('')+'</div><small>庄家为1号位，其余按正常行牌顺序编号。</small></div>';
+      if(result?.kind==='bonusHexes')return '<div class="card-result"><span class="card-result-label">火力全开 · 额外三张</span><div class="card-result-grid">'+result.cards.map(item=>'<span>'+escapeHtml(item.name)+'</span>').join('')+'</div><small>这三张海克斯与本卡同时生效；本局不再进入后续抽取节点。</small></div>';
       return '';
     }
     function roomNow(){return Date.now()+serverClockOffset;}
@@ -672,8 +707,8 @@
       return cards.filter(c=>!state.used.includes(c.id)&&Array.isArray(c.tags)&&(c.tags.includes('any')||c.tags.includes(phaseId))&&active.every(other=>!cardsConflict(c,other)));
     }
     function nextPendingPhase(){return phases.find(p=>!state.triggered.includes(p.id));}
-    function phaseLabel(id){return phaseMap[id].name+' · '+phaseMap[id].desc;}
-    function cardScope(card,phaseId){return (phaseId==='firstWin'||phaseId==='secondWin')?'下一局':card.scope;}
+    function phaseLabel(id){const phase=phaseMap[id]||phases[0];return phase?(phase.name+(phase.desc?' · '+phase.desc:'')):'未设置节点';}
+    function cardScope(card){return card.scope||'本局';}
     function cardPhaseText(card,phaseId){
       if(card.tags?.includes('settlement'))return '结算时 · 3% 概率';
       if(phaseId==='catalog')return card.tags?.includes('any')?'全节点':(card.tags||[]).map(tag=>phaseMap[tag]?.name||tag).join(' / ')||'未分类';
@@ -685,22 +720,22 @@
       const interactive=Number.isInteger(activeIndex)||Number.isInteger(catalogIndex)||revealable;
       const art=artByCard[card.id];
       const artClass=art?' art-card':'';
-      const artMarkup=art?'<img src="'+art.preview+'" alt="'+card.name+' 全息卡预览" loading="lazy">':'<span class="glyph">'+card.glyph+'</span>';
-      const viewer=art?'<a class="card-viewer-link" href="'+art.viewer+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">打开 3D 闪卡 ↗</a>':'';
-      const dataAttr=(Number.isInteger(activeIndex)?' data-active-index="'+activeIndex+'"':'')+(Number.isInteger(catalogIndex)?' data-catalog-index="'+catalogIndex+'"':'')+(revealable?' data-reveal-id="'+card.id+'"':'');
-      return '<article class="hex-card'+c+artClass+(large?' reveal-card':'')+'" data-card-id="'+card.id+'"'+(interactive?' role="button" tabindex="0"'+dataAttr+' aria-label="'+(revealable?'揭晓':'放大查看')+card.name+'" aria-haspopup="dialog"':'')+'>'+ 
-        '<div class="card-top"><span class="card-code">'+card.id+'</span><span class="card-type">'+(card.prismatic?'PRISMATIC':(card.challenge?'CHALLENGE':'AUGMENT'))+'</span></div>'+ 
+      const artMarkup=art?'<img src="'+escapeAttr(art.preview)+'" alt="'+escapeAttr(card.name)+' 全息卡预览" loading="lazy">':'<span class="glyph">'+escapeHtml(card.glyph||'✦')+'</span>';
+      const viewer=art?'<a class="card-viewer-link" href="'+escapeAttr(art.viewer)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">打开 3D 闪卡 ↗</a>':'';
+      const dataAttr=(Number.isInteger(activeIndex)?' data-active-index="'+activeIndex+'"':'')+(Number.isInteger(catalogIndex)?' data-catalog-index="'+catalogIndex+'"':'')+(revealable?' data-reveal-id="'+escapeAttr(card.id)+'"':'');
+      return '<article class="hex-card'+c+artClass+(large?' reveal-card':'')+'" data-card-id="'+escapeAttr(card.id)+'"'+(interactive?' role="button" tabindex="0"'+dataAttr+' aria-label="'+escapeAttr((revealable?'揭晓':'放大查看')+card.name)+'" aria-haspopup="dialog"':'')+'>'+
+        '<div class="card-top"><span class="card-code">'+escapeHtml(card.id)+'</span><span class="card-type">'+(card.prismatic?'PRISMATIC':(card.challenge?'CHALLENGE':'AUGMENT'))+'</span></div>'+
         '<div class="card-art">'+artMarkup+'</div>'+ 
-        '<div class="card-body"><h3 class="card-name">'+card.name+'</h3>'+resultMarkup(card)+'<p class="card-effect">'+card.effect+'</p>'+cardTimerMarkup(card,phaseId)+ 
-        viewer+'<div class="card-foot"><span class="card-scope">'+cardScope(card,phaseId)+'</span><span>'+cardPhaseText(card,phaseId)+'</span></div>'+(interactive?'<div class="card-hint">'+(revealable?'再次点击揭晓随机结果 ✦':'点击放大查看 ↗')+'</div>':'')+'</div></article>';
+        '<div class="card-body"><h3 class="card-name">'+escapeHtml(card.name)+'</h3>'+resultMarkup(card)+'<p class="card-effect">'+escapeHtml(card.effect)+'</p>'+cardTimerMarkup(card,phaseId)+
+        viewer+'<div class="card-foot"><span class="card-scope">'+escapeHtml(cardScope(card))+'</span><span>'+escapeHtml(cardPhaseText(card,phaseId))+'</span></div>'+(interactive?'<div class="card-hint">'+(revealable?'再次点击揭晓随机结果 ✦':'点击放大查看 ↗')+'</div>':'')+'</div></article>';
     }
     function renderPhases(){
       const markup=phases.map((p,i)=>{
         const done=state.triggered.includes(p.id);
         const selectable=done||(!state.locked&&nextPendingPhase()?.id===p.id);
-        return '<button class="phase '+(state.phase===p.id?'active ':'')+(done?'done':'')+'" data-phase="'+p.id+'"'+(selectable?'':' disabled')+'>'+ 
+        return '<button class="phase '+(state.phase===p.id?'active ':'')+(done?'done':'')+'" data-phase="'+escapeAttr(p.id)+'"'+(selectable?'':' disabled')+'>'+
           '<span class="phase-dot">'+(done?'✓':String(i+1).padStart(2,'0'))+'</span>'+ 
-          '<span><span class="phase-name">'+p.name+'</span><span class="phase-desc">'+p.desc+(done?' · 已抽取':'')+'</span></span></button>';
+          '<span><span class="phase-name">'+escapeHtml(p.name)+'</span><span class="phase-desc">'+escapeHtml((p.desc||'')+(done?' · 已抽取':''))+'</span></span></button>';
       }).join('');
       [phaseList,mobilePhaseList].forEach(list=>{
         if(!list)return;
@@ -716,26 +751,28 @@
     function renderHistory(){
       $('logCount').textContent=state.history.length+' 条';
       if(!state.history.length){history.innerHTML='<div class="history-empty">每次翻牌都会在这里留下记录。</div>';return;}
-      history.innerHTML=state.history.slice().reverse().map((h,i)=>'<div class="history-item '+(h.challenge?'challenge':'')+'"><span class="history-num">'+(state.history.length-i)+'</span><div><div class="history-name">'+h.name+'</div><div class="history-meta">'+h.phaseName+' · '+h.time+'</div>'+(h.result?'<div class="history-meta">'+h.result+'</div>':'')+'</div></div>').join('');
+      history.innerHTML=state.history.slice().reverse().map((h,i)=>'<div class="history-item '+(h.challenge?'challenge':'')+'"><span class="history-num">'+(state.history.length-i)+'</span><div><div class="history-name">'+escapeHtml(h.name)+'</div><div class="history-meta">'+escapeHtml(h.phaseName)+' · '+escapeHtml(h.time)+'</div>'+(h.result?'<div class="history-meta">'+escapeHtml(h.result)+'</div>':'')+'</div></div>').join('');
     }
     function renderCatalog(){
       const groups=[
-        {title:'棱彩海克斯',meta:'R 系列 · 重大规则改写',className:'prismatic',items:cards.filter(card=>card.prismatic)},
-        {title:'普通海克斯',meta:'P 系列 · 正面与趣味效果',className:'',items:cards.filter(card=>!card.prismatic&&!card.challenge)},
-        {title:'限制海克斯',meta:'N 系列 · 负面与限制效果',className:'',items:cards.filter(card=>!card.prismatic&&card.challenge)}
+        {title:'棱彩海克斯',meta:'重大规则改写',className:'prismatic',items:cards.filter(card=>card.prismatic)},
+        {title:'普通海克斯',meta:'正面与趣味效果',className:'',items:cards.filter(card=>!card.prismatic&&!card.challenge)},
+        {title:'限制海克斯',meta:'负面与限制效果',className:'',items:cards.filter(card=>!card.prismatic&&card.challenge)}
       ];
       $('catalogGrid').innerHTML=groups.map(group=>'<div class="catalog-section-title '+group.className+'"><strong>'+group.title+'</strong><span>'+group.meta+' · '+group.items.length+' 张</span></div>'+group.items.map(card=>cardMarkup(card,'catalog',false,undefined,cards.indexOf(card))).join('')).join('');
     }
     function render(){
       if(!state.turnTimer)state.turnTimer={started:false,endsAt:null,revision:0,cardId:null,durationSeconds:7};
       if(!state.roundTimer)state.roundTimer={started:false,endsAt:null,revision:0,cardId:null,durationSeconds:60};
-      const phase=phaseMap[state.phase], eligible=phaseCards(state.phase), done=state.triggered.includes(state.phase);
+      const phase=phaseMap[state.phase]||phases[0]||{id:'opening',name:'开局',title:'开局海克斯',detail:'抽取一张海克斯。'}, eligible=phaseCards(phase.id), done=state.triggered.includes(phase.id);
+      if(state.phase!==phase.id)state.phase=phase.id;
       const pending=nextPendingPhase();
       const allDrawn=phases.every(item=>state.triggered.includes(item.id));
       const resetReady=allDrawn||state.locked;
-      $('currentPhaseLabel').textContent=phaseLabel(state.phase);
+      const nodeCount=phases.length;
+      $('currentPhaseLabel').textContent=phaseLabel(phase.id);
       $('drawTitle').textContent=resetReady?(allDrawn?'本局海克斯已集齐':'本局抽取已结束'):phase.title;
-      $('drawDescription').textContent=allDrawn?'三个抽取节点均已完成。线下牌局结束后点击结算，将有 3% 概率触发棱彩奇迹。':state.locked?'本局后续海克斯抽取已被封锁。线下牌局结束后点击结算，将有 3% 概率触发棱彩奇迹。':phase.detail;
+      $('drawDescription').textContent=allDrawn?nodeCount+' 个抽取节点均已完成。线下牌局结束后点击结算；若卡池包含败者食尘，将有 3% 概率触发。':state.locked?'本局后续海克斯抽取已被封锁。线下牌局结束后即可结算。':phase.detail;
       $('eligibleCount').textContent=resetReady?0:eligible.length;
       $('cardPoolCount').textContent=drawPoolCards.length;
       $('catalogCount').textContent=cards.length;
@@ -748,7 +785,7 @@
       $('resetBtn').textContent=resetReady?'结算本局':'重置本局';
       $('resetBtn').disabled=!inRoom||!syncReady;
       renderPhases();renderActive();renderHistory();updateTimerUi();
-      $('phaseState').textContent=!inRoom?'加入房间后才能抽取海克斯。':allDrawn?'三个节点均已完成，可以结算本局。':state.locked?'本局后续海克斯抽取已结束，可以结算本局。':done?'这个节点已经翻过牌了。可以点击其他节点查看状态。':(!pending||pending.id!==state.phase)?'请按顺序完成前面的节点。':'选择节点后，点击中央按钮随机翻开一张海克斯。';
+      $('phaseState').textContent=!inRoom?'加入房间后才能抽取海克斯。':allDrawn?nodeCount+' 个节点均已完成，可以结算本局。':state.locked?'本局后续海克斯抽取已结束，可以结算本局。':done?'这个节点已经翻过牌了。可以点击其他节点查看状态。':(!pending||pending.id!==phase.id)?'请按顺序完成前面的节点。':'选择节点后，点击中央按钮随机翻开一张海克斯。';
     }
     function showToast(msg,duration=2600){
       toast.textContent=msg;toast.classList.add('show');clearTimeout(showToast.t);
@@ -761,9 +798,10 @@
       roomModalMode=mode;roomModalOpener=document.activeElement;setRoomModalError('');setLobbyStatus('');
       const creating=mode==='create';
       $('roomModalTitle').textContent=creating?'创建房间':'搜索房间';
-      $('roomModalDescription').textContent=creating?'设置一个 6 位数字密码，系统会自动生成房间号。':'输入 4 位房间号和 6 位数字密码，搜索并加入正在进行的房间。';
+      $('roomModalDescription').textContent=creating?'选择本局卡池并设置 6 位数字密码，系统会自动生成房间号。':'输入 4 位房间号和 6 位数字密码，搜索并加入正在进行的房间。';
       $('roomModalSubmit').textContent=creating?'创建房间':'搜索并加入';
       roomModalIdLabel.hidden=creating;roomModalId.required=!creating;roomModalId.value=prefillRoom||'';roomModalPassword.value='';
+      $('roomPoolLabel').hidden=!creating;$('roomPoolSelect').disabled=!creating;if(creating)renderRoomPoolOptions();
       roomModal.classList.add('open');roomModal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
       (creating?roomModalPassword:roomModalId).focus();
     }
@@ -772,12 +810,14 @@
     }
     function showLobby(message='',isError=false){
       inRoom=false;roomId='';memberToken='';roomInfo=null;
+      applyRoomConfig(null);
       $('roomBadge').hidden=true;$('leaveRoomBtn').hidden=true;closeRoomModal();lobbyScreen.classList.remove('hidden');setLobbyStatus(message,isError);render();
       requestAnimationFrame(()=>{lobbyScreen.scrollTop=0;roomList.scrollTop=0;});
     }
     function enterRoom(message){
       const previousRoomId=roomId;
       inRoom=true;roomId=String(message.roomId||'');memberToken=String(message.memberToken||'');roomInfo=message.room||null;
+      applyRoomConfig(message.config);
       if(previousRoomId!==roomId){Object.values(timerObservations).forEach(item=>{item.key='';item.remaining=null;});}
       if(roomId&&memberToken)storageSet('hexMahjongRoom',JSON.stringify({roomId,memberToken}));
       $('roomBadgeId').textContent=roomId;$('roomBadge').hidden=!roomId;$('leaveRoomBtn').hidden=false;closeRoomModal();lobbyScreen.classList.add('hidden');setLobbyStatus('');
@@ -800,7 +840,7 @@
         top.append(id,status);
         const stats=document.createElement('div');stats.className='room-card-stats';
         const online=document.createElement('div');online.className='room-stat';online.append(document.createTextNode('在线玩家'),Object.assign(document.createElement('strong'),{textContent:memberCount+' / 4'}));
-        const progress=document.createElement('div');progress.className='room-stat';progress.append(document.createTextNode('抽取节点'),Object.assign(document.createElement('strong'),{textContent:drawnCount+' / 3'}));
+        const progress=document.createElement('div');progress.className='room-stat';progress.append(document.createTextNode('抽取节点'),Object.assign(document.createElement('strong'),{textContent:drawnCount+' / '+Math.max(1,Number(room.nodeCount||3))}));
         stats.append(online,progress);
         const button=document.createElement('button');button.type='button';button.className='room-join-mini';button.textContent=isFull?'房间已满':'加入房间';button.disabled=isFull;
         const join=()=>{if(!isFull)openRoomModal('join',room.id);};
@@ -990,7 +1030,7 @@
       if(!creating&&!/^\d{4}$/.test(id)){setRoomModalError('房间号必须是 4 位数字。');return;}
       if(!/^\d{6}$/.test(password)){setRoomModalError('房间密码必须是 6 位数字。');return;}
       roomModalSubmit.disabled=true;setRoomModalError(creating?'正在创建房间…':'正在验证房间密码…');
-      const sent=sendLobbyRequest(creating?'createRoom':'joinRoom',creating?{password}:{roomId:id,password});
+      const sent=sendLobbyRequest(creating?'createRoom':'joinRoom',creating?{password,poolId:$('roomPoolSelect').value}:{roomId:id,password});
       if(!sent)roomModalSubmit.disabled=false;
     });
     $('leaveRoomBtn').addEventListener('click',()=>{
@@ -1045,7 +1085,8 @@
               openCardModal(message.card,message.phase,true);
             }else{
               const bonusLabel=message.bonusCards?.length?(' · 额外获得：'+message.bonusCards.map(card=>card.name).join('、')):'';
-              const nextLabel=(!message.state?.locked&&message.state?.phase)?(' · 下一节点：'+phaseMap[message.state.phase].name):'';
+              const nextPhase=phaseMap[message.state?.phase];
+              const nextLabel=(!message.state?.locked&&nextPhase)?(' · 下一节点：'+nextPhase.name):'';
               showToast('其他玩家抽取了「'+message.card.name+'」'+bonusLabel+nextLabel,2600);
             }
             if(message.card.id==='R04')showToast('静水监狱：本局后续海克斯抽取已锁定',message.drawnBy===clientId?2600:2000);
@@ -1067,7 +1108,7 @@
           }
         }else if(message.type==='error'){
           $('createRoomActionBtn').disabled=false;$('joinRoomActionBtn').disabled=false;roomModalSubmit.disabled=false;
-          if(['BAD_PASSWORD','JOIN_LOCKED','ROOM_NOT_FOUND','INVALID_ROOM_ID','INVALID_PASSWORD','ROOM_FULL','ROOM_LIMIT','CREATE_LIMIT'].includes(message.code)){
+          if(['BAD_PASSWORD','JOIN_LOCKED','ROOM_NOT_FOUND','INVALID_ROOM_ID','INVALID_PASSWORD','ROOM_FULL','ROOM_LIMIT','CREATE_LIMIT','LOGIN_REQUIRED','POOL_NOT_FOUND','POOL_INVALID'].includes(message.code)){
             setRoomModalError(message.message||'加入房间失败。');
             setLobbyStatus(message.message||'加入房间失败。',true);
           }
@@ -1078,6 +1119,7 @@
       socket.addEventListener('close',()=>{syncReady=false;setSyncStatus('同步断开','offline');$('createRoomActionBtn').disabled=true;$('joinRoomActionBtn').disabled=true;roomModalSubmit.disabled=true;render();setTimeout(()=>{if(!syncReady)connectSync();},1800);});
       socket.addEventListener('error',()=>setSyncStatus('同步错误','offline'));
     }
+    loadLobbyAccount();
     connectSync();
     render();
     setInterval(updateTimerUi,100);

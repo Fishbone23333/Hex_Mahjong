@@ -10,7 +10,12 @@
     "test:timer": "node scripts/timer-smoke-test.mjs",
     "test:battle-royale": "node scripts/battle-royale-smoke-test.mjs",
     "test:conflicts": "node scripts/conflict-smoke-test.mjs",
-    "test:recent-cards": "node scripts/recent-card-smoke-test.mjs"
+    "test:recent-cards": "node scripts/recent-card-smoke-test.mjs",
+    "test:accounts": "node scripts/account-smoke-test.mjs",
+    "test": "npm run test:conflicts && npm run test:recent-cards && npm run test:battle-royale && npm run test:timer && npm run test:security && npm run test:settlement && npm run test:accounts"
+  },
+  "engines": {
+    "node": ">=22.5.0"
   },
   "dependencies": {
     "ws": "^8.18.3"

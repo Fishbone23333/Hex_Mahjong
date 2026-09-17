@@ -3,7 +3,7 @@ import {spawn} from 'node:child_process';
 import WebSocket from 'ws';
 
 const port=3199,base=`http://127.0.0.1:${port}`,origin=base;
-const server=spawn(process.execPath,['server.mjs'],{cwd:new URL('..',import.meta.url),env:{...process.env,PORT:String(port)},stdio:['ignore','pipe','pipe']});
+const server=spawn(process.execPath,['server.mjs'],{cwd:new URL('..',import.meta.url),env:{...process.env,PORT:String(port),HEX_DB_PATH:':memory:',NODE_NO_WARNINGS:'1'},stdio:['ignore','pipe','pipe']});
 const stop=()=>{if(!server.killed)server.kill();};
 process.on('exit',stop);
 

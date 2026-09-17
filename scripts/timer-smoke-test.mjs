@@ -2,16 +2,17 @@ import {strict as assert} from 'node:assert';
 import {spawn} from 'node:child_process';
 import {readFile} from 'node:fs/promises';
 import WebSocket from 'ws';
+import {initialOpeningPool} from './test-card-selection.mjs';
 
 const port=3202,origin=`http://127.0.0.1:${port}`;
 const cards=JSON.parse(await readFile(new URL('../cards.json',import.meta.url),'utf8'));
-const openingPool=cards.filter(card=>card.tags.includes('any')||card.tags.includes('opening'));
+const openingPool=initialOpeningPool(cards);
 const targetIndex=openingPool.findIndex(card=>card.id==='R02');
 assert.ok(targetIndex>=0,'R02 missing from opening pool');
 const fixedRandom=((targetIndex+0.25)/openingPool.length).toString();
 const server=spawn(process.execPath,['--input-type=module','--eval',`Math.random=()=>${fixedRandom}; await import('./server.mjs');`],{
   cwd:new URL('..',import.meta.url),
-  env:{...process.env,PORT:String(port)},
+  env:{...process.env,PORT:String(port),HEX_DB_PATH:':memory:',NODE_NO_WARNINGS:'1'},
   stdio:['ignore','pipe','pipe']
 });
 const stop=()=>{if(!server.killed)server.kill();};

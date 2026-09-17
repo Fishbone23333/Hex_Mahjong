@@ -5,7 +5,7 @@ import WebSocket from 'ws';
 const port=3201,origin=`http://127.0.0.1:${port}`;
 const server=spawn(process.execPath,['server.mjs'],{
   cwd:new URL('..',import.meta.url),
-  env:{...process.env,PORT:String(port),SETTLEMENT_TRIGGER_RATE:'1'},
+  env:{...process.env,PORT:String(port),SETTLEMENT_TRIGGER_RATE:'1',HEX_DB_PATH:':memory:',NODE_NO_WARNINGS:'1'},
   stdio:['ignore','pipe','pipe']
 });
 const stop=()=>{if(!server.killed)server.kill();};
