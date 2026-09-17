@@ -1,0 +1,52 @@
+{
+  "mode": "holographic",
+  "title": "败者食尘",
+  "tagline": "本局损失筹码最多的玩家(们)的结算作废。",
+  "description": "本局损失筹码最多的玩家(们)的结算作废。",
+  "font": "C:/Windows/Fonts/msyhbd.ttc",
+  "transparentCorners": true,
+  "geometry": {
+    "cornerRadius": 0.34
+  },
+  "textLayout": {
+    "elements": [
+      {
+        "field": "title",
+        "x": 512,
+        "y": 815,
+        "size": 70,
+        "maxWidth": 530,
+        "anchor": "mm",
+        "font": "C:/Windows/Fonts/msyhbd.ttc",
+        "color": [255, 247, 224, 255],
+        "stroke": [6, 13, 20, 245],
+        "strokeWidth": 3
+      },
+      {
+        "field": "tagline",
+        "x": 512,
+        "y": 1045,
+        "size": 36,
+        "maxWidth": 530,
+        "wrap": true,
+        "lineSpacing": 17,
+        "font": "C:/Windows/Fonts/msyhbd.ttc",
+        "color": [255, 247, 224, 255],
+        "stroke": [6, 13, 20, 245],
+        "strokeWidth": 2
+      }
+    ]
+  },
+  "parameters": {
+    "subjectScale": 1.08,
+    "subjectDepth": 0.58,
+    "backgroundDepth": -0.24,
+    "foil": 1.15,
+    "particles": 0.85,
+    "glow": 0.95
+  },
+  "safeArea": {
+    "scale": 1.0,
+    "offset": [0, 0]
+  }
+}

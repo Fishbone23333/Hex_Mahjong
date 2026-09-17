@@ -1,0 +1,21 @@
+node_modules/
+**/node_modules/
+
+# Local runtime and browser caches
+artifacts/**/tools/
+tools/holo-card-studio/
+*.log
+.tmp-*
+
+# Local secrets and environment overrides
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

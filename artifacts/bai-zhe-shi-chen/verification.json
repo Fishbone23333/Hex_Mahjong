@@ -1,0 +1,138 @@
+{
+  "blender": "4.5.10 LTS",
+  "language": "zh_HANS",
+  "interface_translation": true,
+  "config": "D:\\pyproject\\HAX\\artifacts\\bai-zhe-shi-chen\\tools\\blender-config",
+  "render_engine": "CYCLES",
+  "device": "GPU",
+  "images": {
+    "subject": {
+      "size": [
+        1024,
+        1536
+      ],
+      "channels": 4,
+      "packed": true
+    },
+    "text": {
+      "size": [
+        1024,
+        1536
+      ],
+      "channels": 4,
+      "packed": true
+    },
+    "background": {
+      "size": [
+        1024,
+        1536
+      ],
+      "channels": 4,
+      "packed": true
+    },
+    "lineart": {
+      "size": [
+        1024,
+        1536
+      ],
+      "channels": 4,
+      "packed": true
+    }
+  },
+  "planes": {
+    "主体平面 · 完整视差合成": {
+      "rotation_degrees": [
+        90.0,
+        0.0,
+        0.0
+      ],
+      "mode": "OBJECT"
+    },
+    "文字平面 · Alpha PNG": {
+      "rotation_degrees": [
+        90.0,
+        0.0,
+        0.0
+      ],
+      "mode": "OBJECT"
+    },
+    "背景平面 · 已在主体材质合成": {
+      "rotation_degrees": [
+        90.0,
+        0.0,
+        0.0
+      ],
+      "mode": "OBJECT"
+    }
+  },
+  "parameters": {
+    "主体缩放": 1.08,
+    "主体深度": 0.58,
+    "背景深度": -0.24
+  },
+  "frames": [
+    1,
+    25,
+    49,
+    73,
+    96
+  ],
+  "source_art": {
+    "size": [
+      1024,
+      1536
+    ],
+    "mode": "RGBA",
+    "transparent_corners": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "card_geometry": {
+    "corner_radius": 0.34,
+    "transparent_front": true,
+    "transparent_back": true,
+    "transparent_render_background": true
+  },
+  "text_layout": {
+    "fields": [
+      "title",
+      "tagline"
+    ],
+    "other_card_text_removed": true,
+    "title_center": [
+      512,
+      815
+    ],
+    "description_center": [
+      512,
+      1045
+    ]
+  },
+  "render_alpha": {
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "corner_alpha": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "render_previews": [
+    "renders/hero.png",
+    "renders/angle-left.png",
+    "renders/angle-right.png"
+  ],
+  "browser_checks": {
+    "desktop_screenshot": "web/headless-check.png",
+    "mobile_screenshot": "web/headless-mobile.png",
+    "assets_http_200": true,
+    "webgl_card_loaded": true
+  }
+}

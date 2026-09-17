@@ -1,0 +1,18 @@
+{
+  "name": "hex-mahjong",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test:security": "node scripts/security-smoke-test.mjs",
+    "test:settlement": "node scripts/settlement-smoke-test.mjs",
+    "test:timer": "node scripts/timer-smoke-test.mjs",
+    "test:battle-royale": "node scripts/battle-royale-smoke-test.mjs",
+    "test:conflicts": "node scripts/conflict-smoke-test.mjs",
+    "test:recent-cards": "node scripts/recent-card-smoke-test.mjs"
+  },
+  "dependencies": {
+    "ws": "^8.18.3"
+  }
+}
