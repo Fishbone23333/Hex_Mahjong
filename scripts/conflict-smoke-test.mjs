@@ -2,6 +2,7 @@ import {strict as assert} from 'node:assert';
 import {spawn} from 'node:child_process';
 import {readFile} from 'node:fs/promises';
 import WebSocket from 'ws';
+import {initialOpeningPool} from './test-card-selection.mjs';
 
 const cards=JSON.parse(await readFile(new URL('../cards.json',import.meta.url),'utf8'));
 const byId=Object.fromEntries(cards.map(card=>[card.id,card]));
@@ -11,15 +12,29 @@ const cardsConflict=(left,right)=>{
 };
 const expectedPairs=[
   ['P02','P14'],['P04','P05'],['P04','P16'],['P05','P16'],
-  ['P19','P17'],['P19','N06'],['P19','P43'],['P19','P44'],['P43','P44'],
+  ['P19','P17'],['P19','N06'],['P19','P44'],
   ['P18','P42'],['P18','R01'],['P18','R03'],['P42','R01'],['P42','R03'],['R01','R03'],
-  ['P21','R02'],['P24','P25']
+  ['P21','R02'],['P24','P25'],
+  ['P18','N03'],['R02','R05'],['N01','P44'],['P01','P33'],
+  ['N05','N09'],['P41','N05'],['P41','P29'],['N03','P15'],
+  ['R04','P18'],['R04','P42'],['R04','R01'],['R04','R03']
 ];
-for(const [left,right] of expectedPairs)assert.equal(cardsConflict(byId[left],byId[right]),true,`${left} and ${right} must conflict`);
-for(const id of ['R04','P42','R03']){
+for(const [left,right] of expectedPairs){
+  assert.equal(cardsConflict(byId[left],byId[right]),true,`${left} and ${right} must conflict`);
+  assert.equal(cardsConflict(byId[right],byId[left]),true,`${right} and ${left} must conflict`);
+}
+const compatiblePairs=[
+  ['P12','P11'],['P12','P10'],['P15','P11'],['P15','P12'],
+  ['P02','P16'],['P14','P16'],['P04','N01'],['P21','P17'],
+  ['P09','P36'],['P07','P06'],['P07','P08'],['P07','P30'],
+  ['P22','P03'],['P39','N09']
+];
+for(const [left,right] of compatiblePairs)assert.equal(cardsConflict(byId[left],byId[right]),false,`${left} and ${right} should stay compatible`);
+for(const id of ['R01','R04','P42','R03']){
   assert.equal(byId[id].bonusEligible,false,`${id} must be excluded from Firepower Full On bonuses`);
   assert.equal(byId[id].lockFurtherDraws,true,`${id} must lock later draws`);
 }
+assert.deepEqual(byId.N07.tags,['settlement'],'soul transfer must not enter normal draws');
 const prismaticIds=['R01','R02','R03','R04','R05','R06'];
 for(const id of prismaticIds)assert.equal(byId[id].prismatic,true,`${id} must be marked prismatic`);
 assert.deepEqual(cards.filter(card=>card.prismatic).map(card=>card.id),prismaticIds,'prismatic cards must stay together in R-series order');
@@ -27,12 +42,12 @@ assert.deepEqual(cards.slice(-prismaticIds.length).map(card=>card.id),prismaticI
 for(const id of ['R01','R02','R03','R04','R05'])assert.equal(byId[id].tags.includes('settlement'),false,`${id} prismatic rarity must not change its draw node`);
 
 const port=3204,origin=`http://127.0.0.1:${port}`;
-const openingPool=cards.filter(card=>card.tags.includes('any')||card.tags.includes('opening'));
+const openingPool=initialOpeningPool(cards);
 const targetIndex=openingPool.findIndex(card=>card.id==='P31');
 assert.ok(targetIndex>=0,'P31 missing from opening pool');
 const fixedRandom=((targetIndex+0.25)/openingPool.length).toString();
 const server=spawn(process.execPath,['--input-type=module','--eval',`Math.random=()=>${fixedRandom}; await import('./server.mjs');`],{
-  cwd:new URL('..',import.meta.url),env:{...process.env,PORT:String(port)},stdio:['ignore','pipe','pipe']
+  cwd:new URL('..',import.meta.url),env:{...process.env,PORT:String(port),HEX_DB_PATH:':memory:',NODE_NO_WARNINGS:'1'},stdio:['ignore','pipe','pipe']
 });
 const stop=()=>{if(!server.killed)server.kill();};
 process.on('exit',stop);

@@ -1,11 +1,48 @@
 node_modules/
 **/node_modules/
+data/
 
 # Local runtime and browser caches
 artifacts/**/tools/
 tools/holo-card-studio/
 *.log
 .tmp-*
+*.tar.gz
+qa-*.log
+
+# Local design, release and deployment records
+/account-redesign/
+/design-variants/
+/artifacts/email-binding/
+/artifacts/security-review/
+/deploy/部署记录-*.md
+/deploy/*-local.*
+/blender-listing.html
+/patch-viewer.cjs
+/海克斯规则改良计划.md
+/上线前安全检查与改进计划.md
+/闪卡制作流程与踩坑记录.md
+
+# Holo-card source files and render outputs; keep only the runtime web bundle
+artifacts/**/card.blend
+artifacts/**/card.blend1
+artifacts/**/renders/
+artifacts/**/source-*.png
+artifacts/**/prepare_assets.py
+artifacts/**/update_verification.py
+artifacts/**/verification.json
+artifacts/**/asset-validation.json
+artifacts/*/card-config.json
+artifacts/**/web/headless-*.png
+artifacts/jing-shui-jian-yu/
+/image/
+
+# Local deployment output and diagnostics
+/deploy/hex-mahjong.env
+/server.log
+/server-error.log
+/qa-room-pools.log
+/qa-room-pools-error.log
 
 # Local secrets and environment overrides
 .env

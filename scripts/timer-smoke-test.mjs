@@ -2,16 +2,17 @@ import {strict as assert} from 'node:assert';
 import {spawn} from 'node:child_process';
 import {readFile} from 'node:fs/promises';
 import WebSocket from 'ws';
+import {initialOpeningPool} from './test-card-selection.mjs';
 
 const port=3202,origin=`http://127.0.0.1:${port}`;
 const cards=JSON.parse(await readFile(new URL('../cards.json',import.meta.url),'utf8'));
-const openingPool=cards.filter(card=>card.tags.includes('any')||card.tags.includes('opening'));
+const openingPool=initialOpeningPool(cards);
 const targetIndex=openingPool.findIndex(card=>card.id==='R02');
 assert.ok(targetIndex>=0,'R02 missing from opening pool');
 const fixedRandom=((targetIndex+0.25)/openingPool.length).toString();
 const server=spawn(process.execPath,['--input-type=module','--eval',`Math.random=()=>${fixedRandom}; await import('./server.mjs');`],{
   cwd:new URL('..',import.meta.url),
-  env:{...process.env,PORT:String(port)},
+  env:{...process.env,PORT:String(port),HEX_DB_PATH:':memory:',NODE_NO_WARNINGS:'1'},
   stdio:['ignore','pipe','pipe']
 });
 const stop=()=>{if(!server.killed)server.kill();};
@@ -49,11 +50,23 @@ try{
   assert.equal(drawn.card.id,'R02');
   assert.equal(drawn.card.name,'无限火力');
 
+  const armedOwnerPromise=waitFor(owner,message=>message.type==='timer');
+  const armedGuestPromise=waitFor(guest,message=>message.type==='timer');
+  owner.send(JSON.stringify({type:'timer',action:'arm',cardId:'R02'}));
+  const [armedOwner,armedGuest]=await Promise.all([armedOwnerPromise,armedGuestPromise]);
+  assert.equal(armedOwner.state.turnTimer.cardId,'R02');
+  assert.equal(armedOwner.state.turnTimer.armed,true);
+  assert.equal(armedOwner.state.turnTimer.started,false);
+  assert.equal(armedOwner.state.turnTimer.endsAt,null);
+  assert.deepEqual(armedOwner.state.turnTimer,armedGuest.state.turnTimer);
+
   const ownerTimerPromise=waitFor(owner,message=>message.type==='timer');
   const guestTimerPromise=waitFor(guest,message=>message.type==='timer');
   owner.send(JSON.stringify({type:'timer',action:'start',cardId:'R02'}));
   const [ownerTimer,guestTimer]=await Promise.all([ownerTimerPromise,guestTimerPromise]);
   assert.equal(ownerTimer.state.turnTimer.cardId,'R02');
+  assert.equal(ownerTimer.state.turnTimer.armed,true);
+  assert.equal(ownerTimer.state.turnTimer.started,true);
   assert.equal(ownerTimer.state.turnTimer.durationSeconds,8);
   assert.equal(ownerTimer.state.turnTimer.endsAt,guestTimer.state.turnTimer.endsAt);
   assert.ok(ownerTimer.state.turnTimer.endsAt-ownerTimer.serverTime<=8000);
@@ -61,7 +74,7 @@ try{
 
   const reset=await sendAndWait(guest,{type:'timer',action:'reset',cardId:'R02'},message=>message.type==='timer');
   assert.equal(reset.state.turnTimer.durationSeconds,8);
-  assert.equal(reset.state.turnTimer.revision,2);
+  assert.equal(reset.state.turnTimer.revision,3);
 
   const unavailable=await sendAndWait(owner,{type:'timer',action:'start',cardId:'R05'},message=>message.type==='error');
   assert.equal(unavailable.code,'TIMER_UNAVAILABLE');

@@ -3,7 +3,7 @@ import {spawn} from 'node:child_process';
 import WebSocket from 'ws';
 
 const port=3199,base=`http://127.0.0.1:${port}`,origin=base;
-const server=spawn(process.execPath,['server.mjs'],{cwd:new URL('..',import.meta.url),env:{...process.env,PORT:String(port)},stdio:['ignore','pipe','pipe']});
+const server=spawn(process.execPath,['server.mjs'],{cwd:new URL('..',import.meta.url),env:{...process.env,PORT:String(port),HEX_DB_PATH:':memory:',NODE_NO_WARNINGS:'1'},stdio:['ignore','pipe','pipe']});
 const stop=()=>{if(!server.killed)server.kill();};
 process.on('exit',stop);
 
@@ -48,6 +48,10 @@ try{
   if(joined.roomId!==created.roomId)throw new Error('scrypt password join failed');
   await sendAndWait(guest,{type:'leaveRoom'},message=>message.type==='roomLeft');
   await sendAndWait(owner,{type:'leaveRoom'},message=>message.type==='roomLeft');
+  const lobby=await sendAndWait(guest,{type:'listRooms'},message=>message.type==='lobby');
+  if(lobby.rooms.some(room=>room.id===created.roomId))throw new Error('room survived after all players explicitly left');
+  const deleted=await sendAndWait(guest,{type:'joinRoom',roomId:created.roomId,password:'123456'},message=>message.type==='error');
+  if(deleted.code!=='ROOM_NOT_FOUND')throw new Error('deleted room can still be joined');
 
   for(let index=1;index<5;index++){
     await sendAndWait(owner,{type:'createRoom',password:'123456'},message=>message.type==='roomJoined');
@@ -61,7 +65,7 @@ try{
   if(closeCode!==1009)throw new Error(`unexpected oversized close code ${closeCode}`);
 
   owner.close();guest.close();
-  console.log(JSON.stringify({staticAllowlist:true,securityHeaders:true,originCheck:true,localFileOrigin:true,passwordJoin:true,roomCreationLimit:true,maxPayload:true}));
+  console.log(JSON.stringify({staticAllowlist:true,securityHeaders:true,originCheck:true,localFileOrigin:true,passwordJoin:true,lastExplicitExitDeletesRoom:true,roomCreationLimit:true,maxPayload:true}));
 }finally{
   stop();
 }

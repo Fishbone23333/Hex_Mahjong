@@ -4,7 +4,7 @@ import WebSocket from 'ws';
 
 const port=3205,origin=`http://127.0.0.1:${port}`;
 const server=spawn(process.execPath,['--input-type=module','--eval',`let randomCall=0; Math.random=()=>{randomCall+=1;return randomCall===6?0.02:randomCall===8?0.022:0.01;}; await import('./server.mjs');`],{
-  cwd:new URL('..',import.meta.url),env:{...process.env,PORT:String(port),SETTLEMENT_TRIGGER_RATE:'0'},stdio:['ignore','pipe','pipe']
+  cwd:new URL('..',import.meta.url),env:{...process.env,PORT:String(port),SETTLEMENT_TRIGGER_RATE:'0',HEX_DB_PATH:':memory:',NODE_NO_WARNINGS:'1'},stdio:['ignore','pipe','pipe']
 });
 const stop=()=>{if(!server.killed)server.kill();};
 process.on('exit',stop);
