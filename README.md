@@ -8,7 +8,7 @@
 
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.16-3c873a?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![WebSocket](https://img.shields.io/badge/realtime-WebSocket-5b8def)](https://developer.mozilla.org/docs/Web/API/WebSocket)
-[![License](https://img.shields.io/badge/license-not%20declared-lightgrey)](#许可证)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 ## 目录
 
@@ -305,4 +305,6 @@ git diff --check
 
 ## 许可证
 
-当前仓库还没有提交 LICENSE 文件，因此暂时没有声明具体的开源许可证。准备长期公开或接受外部贡献前，建议根据项目计划补充明确的许可证文本。
+本项目采用 [MIT License](LICENSE)。你可以自由使用、修改、分发和部署本项目，包括商业使用，但需要保留版权声明和许可证文本。
+
+仓库中的图片、音效、闪卡资源和第三方工具生成素材可能有独立的授权条件，使用前请确认对应资源的许可范围；项目依赖也分别遵守各自的许可证。
