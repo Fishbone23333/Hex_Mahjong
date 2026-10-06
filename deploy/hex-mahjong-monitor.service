@@ -1,0 +1,17 @@
+[Unit]
+Description=Hex Mahjong service, storage, backup and certificate checks
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/hex-mahjong.env
+Environment=HEX_BACKUP_DIR=/var/backups/hex-mahjong
+StateDirectory=hex-mahjong-monitor
+WorkingDirectory=/opt/hex-mahjong
+ExecStart=/usr/bin/node /opt/hex-mahjong/scripts/ops-check.mjs
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+# This root oneshot only reads the private certificate and backup timestamps.
+# The network-facing application still runs as the separate unprivileged account.

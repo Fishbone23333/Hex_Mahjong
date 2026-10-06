@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <link rel="icon" href="data:,">
   <title>海克斯麻将 · Hex Mahjong</title>
   <style>
@@ -64,7 +64,6 @@
     .phase.active .phase-dot{color:var(--cyan);border-color:var(--cyan);box-shadow:0 0 16px rgba(118,232,255,.3)}
     .phase.done .phase-dot{color:var(--gold);border-color:rgba(249,203,107,.7)}
     .phase-name{font-size:13px}.phase-desc{display:block;color:var(--muted);font-size:10px;margin-top:3px}
-    .mobile-phase-panel{display:none}
     .phase-state{font-size:10px;color:var(--gold);margin-top:16px;padding:10px;border-left:2px solid var(--gold);background:rgba(249,203,107,.05);line-height:1.6}
     .main{min-width:0}
     .hero{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:24px}
@@ -97,8 +96,38 @@
     .active-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:13px}
     .active-head h2{font-family:Georgia,"Microsoft YaHei",serif;font-weight:400;font-size:22px;margin:0}
     .active-head span{color:var(--muted);font-size:11px}
+    .room-pool-label{max-width:100%;margin:6px 0 0;color:var(--muted);font-size:11px;line-height:1.5;overflow-wrap:anywhere}
     .active-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:14px}
     .empty-state{border:1px dashed rgba(142,164,191,.26);border-radius:9px;padding:31px;text-align:center;color:var(--muted);font-size:12px;grid-column:1/-1}
+    /* 开局占位卡：虚线框，不可点，第一张场地效果会翻在这个位置 */
+    .slot{padding:18px;border:1px dashed rgba(118,232,255,.38);border-radius:16px;background:rgba(118,232,255,.035)}
+    .slot-kicker{display:flex;align-items:center;gap:8px;color:var(--cyan);font-size:12px}
+    .slot-num{width:26px;height:26px;display:grid;place-items:center;border:1px solid currentColor;border-radius:50%;font-size:11px}
+    .slot h3{margin:12px 0 6px;font:400 24px/1.25 Georgia,"Microsoft YaHei",serif}
+    .slot p{margin:0;color:#b4c7da;font-size:13px;line-height:1.65}
+    .slot-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+    .slot-hint{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:16px;padding-top:12px;border-top:1px solid rgba(118,232,255,.14);color:#cfe6f5;font-size:13px}
+    .mini-draw{display:inline-flex;align-items:center;gap:3px;padding:3px 9px 3px 6px;border:1px solid rgba(118,232,255,.7);border-radius:999px;background:rgba(118,232,255,.16);color:#e6fbff;font-size:12px}
+    .mini-draw .m-ico{width:14px;height:14px}
+    .slot-hint>.m-ico{width:18px;height:18px;color:var(--cyan)}
+    .chip{padding:4px 9px;border:1px solid rgba(142,164,191,.26);border-radius:999px;color:var(--muted);font-size:11px}
+    .chip b{color:var(--ink);font-weight:500}
+    .room-invite{margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,rgba(20,39,61,.78),rgba(8,18,32,.82))}
+    .room-invite-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+    .room-invite-head h3{margin:0;font:400 18px Georgia,"Microsoft YaHei",serif}
+    .room-online{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:12px;white-space:nowrap}
+    .room-online b{color:#9ff0c2;font-weight:500}
+    .room-online .m-ico{width:16px;height:16px}
+    .room-code{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 12px 12px 16px;border:1px dashed rgba(249,203,107,.45);border-radius:12px;background:rgba(249,203,107,.05)}
+    .room-code small{display:block;color:var(--muted);font-size:11px}
+    .room-code strong{display:block;margin-top:2px;color:var(--gold);font:600 28px/1.1 Georgia,serif;letter-spacing:.2em}
+    .room-copy-btn{min-height:44px;display:inline-flex;align-items:center;gap:6px;padding:0 16px;border:1px solid rgba(249,203,107,.55);border-radius:999px;background:rgba(249,203,107,.1);color:var(--gold);font-size:13px;cursor:pointer}
+    .room-copy-btn .m-ico{width:17px;height:17px}
+    .room-invite-steps{margin:12px 0 0;padding:0 0 0 18px;color:#b4c7da;font-size:12px;line-height:1.75}
+    .room-invite-foot{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+    .room-invite.compact .room-invite-steps{display:none}
+    .room-invite.compact .room-code strong{font-size:22px}
+    .room-invite{grid-column:1/-1}
     .hex-card{position:relative;min-height:218px;border-radius:9px;overflow:hidden;border:1px solid rgba(118,232,255,.3);
       background:linear-gradient(150deg,#162e46 0%,#0b1729 58%,#111127 100%);box-shadow:0 12px 30px rgba(0,0,0,.28);
       isolation:isolate;animation:cardIn .45s ease both}
@@ -118,18 +147,31 @@
     .card-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:11px;color:#e4f4ff}
     .card-result-grid span{padding:6px;border-radius:4px;background:rgba(0,0,0,.18)}
     .card-result small{display:block;color:var(--muted);font-size:10px;line-height:1.6;margin-top:7px}
-    .turn-timer{margin:13px 0 2px;padding:12px;border:1px solid rgba(249,203,107,.34);border-radius:7px;background:linear-gradient(135deg,rgba(249,203,107,.1),rgba(7,17,30,.45));box-shadow:inset 0 0 22px rgba(249,203,107,.05)}
-    .turn-timer-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;color:var(--muted);font-size:10px;letter-spacing:.08em}
-    .turn-timer-display{display:flex;align-items:baseline;justify-content:center;gap:5px;margin-bottom:10px;color:var(--gold)}
-    .turn-timer-value{font-family:Georgia,"Microsoft YaHei",serif;font-size:38px;line-height:1;font-variant-numeric:tabular-nums;text-shadow:0 0 18px rgba(249,203,107,.38)}
+    .turn-timer{margin:15px 0 2px;padding:16px 15px 15px;border:1px solid rgba(249,203,107,.42);border-radius:10px;background:linear-gradient(135deg,rgba(249,203,107,.13),rgba(7,17,30,.5));box-shadow:inset 0 0 22px rgba(249,203,107,.06)}
+    .turn-timer-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;color:var(--muted);font-size:11px;letter-spacing:.06em}
+    .turn-timer-display{display:flex;align-items:baseline;justify-content:center;gap:5px;margin:2px 0 14px;color:var(--gold)}
+    .turn-timer-value{font-family:Georgia,"Microsoft YaHei",serif;font-size:48px;line-height:1;font-variant-numeric:tabular-nums;text-shadow:0 0 18px rgba(249,203,107,.38)}
     .turn-timer-unit{font-size:11px;color:var(--muted)}
     .turn-timer.urgent{border-color:rgba(255,130,157,.7);background:linear-gradient(135deg,rgba(255,82,118,.16),rgba(25,8,20,.5))}
     .turn-timer.urgent .turn-timer-value{color:#ff9bb2;text-shadow:0 0 22px rgba(255,82,118,.62)}
     .turn-timer.expired{border-color:rgba(255,74,106,.88);box-shadow:0 0 22px rgba(255,74,106,.2),inset 0 0 22px rgba(255,74,106,.09)}
-    .turn-timer-btn{width:100%;border:1px solid rgba(249,203,107,.55);border-radius:5px;padding:9px 12px;background:rgba(249,203,107,.12);color:#fff0c7;font-size:11px;letter-spacing:.06em;cursor:pointer;transition:.2s}
-    .turn-timer-btn:hover,.turn-timer-btn:focus-visible{outline:none;border-color:var(--gold);background:rgba(249,203,107,.2);box-shadow:0 0 18px rgba(249,203,107,.14)}
-    .turn-timer.urgent .turn-timer-btn{border-color:rgba(255,130,157,.58);background:rgba(255,82,118,.12);color:#ffdbe3}
-    .reveal-card .turn-timer{padding:15px}.reveal-card .turn-timer-value{font-size:52px}.reveal-card .turn-timer-btn{padding:11px 14px;font-size:12px}
+    .turn-timer-btn{width:100%;min-height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1px solid rgba(249,203,107,.7);border-radius:9px;padding:15px 14px;background:linear-gradient(135deg,rgba(249,203,107,.2),rgba(145,86,35,.28));color:#fff4d0;font-size:17px;font-weight:700;letter-spacing:.02em;cursor:pointer;touch-action:manipulation;transition:transform .16s,background .2s,border-color .2s,box-shadow .2s}
+    .turn-timer.armed .turn-timer-btn,.turn-timer.running .turn-timer-btn{width:min(100%,300px);aspect-ratio:1;min-height:0;margin:0 auto;border:2px solid rgba(249,203,107,.82);border-radius:50%;padding:24px;background:radial-gradient(circle at 50% 34%,rgba(249,203,107,.32),rgba(145,86,35,.26) 58%,rgba(35,21,27,.45))}
+    .turn-timer-button-value{font-family:Georgia,"Microsoft YaHei",serif;font-size:58px;line-height:.95;font-variant-numeric:tabular-nums;text-shadow:0 0 18px rgba(249,203,107,.5)}
+    .turn-timer-button-unit{font-size:12px;color:#ffe8ac;font-weight:400}
+    .turn-timer-button-label{font-size:17px;line-height:1.25;text-align:center;white-space:nowrap}
+    .turn-timer:not(.armed):not(.running) .turn-timer-button-value,.turn-timer:not(.armed):not(.running) .turn-timer-button-unit{display:none}
+    .turn-timer.armed .turn-timer-display,.turn-timer.running .turn-timer-display{display:none}
+    .turn-timer-btn:hover,.turn-timer-btn:focus-visible{outline:none;border-color:#fff0a8;background:linear-gradient(135deg,rgba(249,203,107,.42),rgba(145,86,35,.42));box-shadow:0 0 24px rgba(249,203,107,.24)}
+    .turn-timer-btn:active{transform:scale(.985)}
+    .turn-timer.urgent .turn-timer-btn{border-color:rgba(255,130,157,.78);background:radial-gradient(circle at 50% 34%,rgba(255,82,118,.42),rgba(101,28,50,.48) 58%,rgba(35,13,26,.58));color:#ffe2e8}
+    .turn-timer.urgent .turn-timer-button-value{color:#ff9bb2;text-shadow:0 0 22px rgba(255,82,118,.68)}
+    .turn-timer.expired .turn-timer-btn{border-color:rgba(255,130,157,.9);background:radial-gradient(circle at 50% 34%,rgba(255,82,118,.5),rgba(101,28,50,.58) 58%,rgba(35,13,26,.66))}
+    .reveal-card .turn-timer{padding:18px 17px 17px}.reveal-card .turn-timer-display .turn-timer-value{font-size:64px}.reveal-card .turn-timer.armed .turn-timer-btn,.reveal-card .turn-timer.running .turn-timer-btn{width:min(100%,300px)}
+    .reveal-card.timer-running .card-effect,.reveal-card.timer-running .card-foot,.reveal-card.timer-running .card-hint{display:none}
+    .reveal-card.timer-running .turn-timer{margin-top:22px;border-color:rgba(249,203,107,.58);background:transparent;box-shadow:none}
+    .reveal-card.timer-running .turn-timer-head{display:none}
+    @media(max-width:420px){.turn-timer-btn{padding:18px}.turn-timer.armed .turn-timer-btn,.turn-timer.running .turn-timer-btn{width:min(100%,248px)}.turn-timer-button-value{font-size:52px}.turn-timer-button-label{font-size:15px}}
     .card-hint{color:var(--muted);font-size:10px;margin-top:9px;text-align:right}
     .card-top{display:flex;justify-content:space-between;align-items:center;padding:13px 14px 0;color:var(--muted);font-size:10px}
     .card-code{letter-spacing:.12em}.card-type{color:var(--gold)}
@@ -173,8 +215,11 @@
     .reveal-card.show{transform:scale(1) rotateY(0);opacity:1}
     .reveal-card .card-art{height:142px}.reveal-card .card-art:before{width:100px;height:100px}.reveal-card .card-art:after{width:70px;height:70px}
     .reveal-card .glyph{font-size:46px}.reveal-card .card-name{font-size:30px}.reveal-card .card-effect{font-size:14px;min-height:90px}
-    .reveal-actions{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:18px}
-    .modal-close{border:1px solid rgba(118,232,255,.34);background:rgba(118,232,255,.08);padding:11px 24px;border-radius:5px;cursor:pointer;font-size:12px}
+    .combo-rules{margin-top:12px;padding:12px 14px;border:1px solid rgba(118,232,255,.28);border-radius:8px;background:rgba(12,35,51,.94);text-align:left;color:#cdeaf3;font-size:12px;line-height:1.6}
+    .combo-rules strong{display:block;margin-bottom:5px;color:var(--cyan);font-size:11px}
+    .combo-rules p{margin:5px 0 0}
+    .reveal-actions{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:28px}
+    .modal-close{min-height:52px;border:1px solid rgba(118,232,255,.34);background:rgba(118,232,255,.08);padding:13px 24px;border-radius:7px;cursor:pointer;font-size:13px}
     .holo-reset-btn{border-color:rgba(249,203,107,.48);background:rgba(249,203,107,.09);color:var(--gold)}
     .holo-reset-btn:hover:not(:disabled){border-color:var(--gold);background:rgba(249,203,107,.16)}
     .holo-reset-btn:disabled{opacity:.45;cursor:wait}
@@ -248,11 +293,190 @@
     @keyframes cardIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
     @keyframes prismaticShine{0%,100%{background-position:0 0,0 0,0 0,100% 0}50%{background-position:0 0,0 0,0 0,-100% 0}}
     @media(max-width:1120px){.layout{grid-template-columns:210px minmax(0,1fr)}.side-panel{grid-column:1/-1;position:static}.history{max-height:220px;display:grid;grid-template-columns:repeat(2,1fr);gap:0 18px}}
-    @media(max-width:760px){.topbar{padding:0 16px}.brand p,.counter{display:none}.layout{display:block;padding:20px 16px 42px}.left-rail>.phase-panel{display:none}.side-panel{position:static;margin-bottom:18px}.phase-list{display:grid;grid-template-columns:repeat(2,1fr)}.phase{grid-template-columns:27px 1fr;padding:9px 5px}.phase-dot{width:24px;height:24px}.draw-panel{display:block;padding:20px}.draw-action{margin-top:24px}.draw-btn{width:152px;height:152px}.hero{display:block}.hero>.status-pill{display:none}.mobile-phase-panel{display:block;margin-top:15px;padding:9px 7px;border:1px solid rgba(118,232,255,.28);border-radius:10px;background:rgba(8,24,40,.78);box-shadow:0 10px 28px rgba(0,0,0,.22)}.mobile-phase-list{display:grid;grid-template-columns:repeat(var(--phase-count,3),minmax(0,1fr));gap:4px}.mobile-phase-list .phase{display:flex;min-width:0;min-height:51px;align-items:center;justify-content:center;flex-direction:column;gap:4px;padding:6px 2px;border-radius:6px;text-align:center}.mobile-phase-list .phase-dot{width:19px;height:19px;flex:none;font-size:8px}.mobile-phase-list .phase-name{display:block;width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:clamp(7px,2.35vw,10px);line-height:1.15;white-space:nowrap}.mobile-phase-list .phase-desc{display:none}.active-grid{grid-template-columns:1fr}.history{grid-template-columns:1fr}}
+    @media(max-width:760px){.topbar{padding:0 16px}.brand p,.counter{display:none}.layout{display:block;padding:20px 16px 42px}.left-rail>.phase-panel{display:none}.side-panel{position:static;margin-bottom:18px}.phase-list{display:grid;grid-template-columns:repeat(2,1fr)}.phase{grid-template-columns:27px 1fr;padding:9px 5px}.phase-dot{width:24px;height:24px}.draw-panel{display:block;padding:20px}.draw-action{margin-top:24px}.draw-btn{width:152px;height:152px}.hero{display:block}.hero>.status-pill{display:none}.active-grid{grid-template-columns:1fr}.history{grid-template-columns:1fr}}
+    /* 手机端（≤760px）悬浮栏：大厅显示胶囊标签栏，进入房间后换成同风格的房间操作栏 */
+    .room-dialog{max-height:calc(100dvh - 32px);overflow-y:auto}
+    .room-pool-field{min-width:0}.room-pool-field[hidden]{display:none}
+    .room-pool-picker{margin-top:6px;min-width:0}
+    .room-pool-trigger{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:12px 14px;border:1px solid rgba(118,232,255,.32);border-radius:6px;background:linear-gradient(135deg,rgba(22,47,66,.9),rgba(6,18,31,.96));color:var(--ink);font:inherit;text-align:left;cursor:pointer;touch-action:manipulation}
+    .room-pool-trigger:hover:not(:disabled),.room-pool-trigger[aria-expanded="true"]{border-color:var(--cyan);background:linear-gradient(135deg,rgba(26,60,80,.96),rgba(9,25,41,.96))}
+    .room-pool-trigger:focus-visible,.room-pool-option:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+    .room-pool-trigger:disabled{opacity:.55;cursor:wait}
+    .room-pool-trigger>.m-ico{width:20px;height:20px;color:var(--gold)}
+    .room-pool-name{flex:1;min-width:0;font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+    .room-pool-chevron{width:8px;height:8px;flex:none;margin:0 3px 4px;border-right:1.5px solid var(--cyan);border-bottom:1.5px solid var(--cyan);transform:rotate(45deg);transition:transform .16s}
+    .room-pool-trigger[aria-expanded="true"] .room-pool-chevron{transform:rotate(225deg);margin-bottom:0}
+    .room-pool-options{max-height:min(248px,35dvh);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(118,232,255,.35) transparent;margin-top:6px;padding:6px;border:1px solid rgba(118,232,255,.32);border-radius:6px;background:#0a1929;box-shadow:0 8px 24px rgba(0,0,0,.24)}
+    .room-pool-options[hidden]{display:none}
+    .room-pool-group-title{padding:7px 8px 5px;color:var(--muted);font-size:11px;letter-spacing:.04em}
+    .room-pool-group+.room-pool-group{margin-top:6px;padding-top:6px;border-top:1px solid var(--line)}
+    .room-pool-option{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:10px 11px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--ink);text-align:left;cursor:pointer;touch-action:manipulation}
+    .room-pool-option:hover,.room-pool-option:focus-visible{background:rgba(118,232,255,.07)}
+    .room-pool-option[aria-selected="true"]{border-color:rgba(249,203,107,.35);background:rgba(249,203,107,.07)}
+    .room-pool-option-copy{flex:1;min-width:0}.room-pool-option-name{display:block;font-size:14px;line-height:1.5;overflow-wrap:anywhere}.room-pool-option-meta{display:block;margin-top:3px;color:var(--muted);font-size:11px;line-height:1.5}
+    .room-pool-option[aria-selected="true"] .room-pool-option-name{color:var(--gold)}
+    .room-pool-check{width:18px;flex:none;color:var(--gold);font-size:17px;text-align:center}
+    @media(prefers-reduced-motion:reduce){.room-pool-chevron{transition:none}}
+    .room-pool-summary{margin-top:9px;padding:10px 12px;border:1px solid rgba(118,232,255,.15);border-radius:6px;background:rgba(118,232,255,.04);color:var(--muted);font-size:11px;line-height:1.6;overflow-wrap:anywhere}
+    .room-pool-summary strong{color:var(--cyan);font-weight:500}.room-pool-summary p{margin:5px 0 0;font-size:11px}.room-pool-summary .pool-nodes{color:var(--ink)}
+    .room-pool-status{margin-top:8px;color:var(--muted);font-size:11px;line-height:1.6}.room-pool-status a,.room-pool-status button{color:var(--gold)}
+    .room-pool-status button{min-height:36px;margin-left:8px;padding:4px 8px;border:1px solid rgba(249,203,107,.3);border-radius:4px;background:transparent;cursor:pointer}
+    .m-icons{position:absolute;width:0;height:0;overflow:hidden}
+    .m-ico{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+    .m-topbar,.m-dock,.m-sheet,.lobby-tabbar{display:none}
+    @media(max-width:760px){
+      .lobby-screen{padding:max(8px,env(safe-area-inset-top)) 8px calc(88px + env(safe-area-inset-bottom))}
+      .lobby-shell{height:100%}
+      .lobby-tabbar{position:fixed;z-index:51;left:50%;bottom:calc(10px + env(safe-area-inset-bottom));transform:translateX(-50%);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:min(calc(100% - 28px),420px);height:62px;padding:5px;border:1px solid rgba(160,220,255,.18);border-radius:999px;background:rgba(14,28,46,.92);backdrop-filter:blur(22px) saturate(1.6);-webkit-backdrop-filter:blur(22px) saturate(1.6);box-shadow:0 14px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08)}
+      .lobby-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;border-radius:999px;color:var(--muted);font-size:10px;text-decoration:none}
+      .lobby-tab[aria-current="page"]{background:rgba(118,232,255,.14);color:var(--cyan)}
+      .lobby-tab:active{background:rgba(255,255,255,.07)}
+      .lobby-tab span{overflow:hidden;max-width:100%;text-overflow:ellipsis;white-space:nowrap}
+      body:not(.in-room) .topbar,body:not(.in-room) .layout{visibility:hidden}
+      /* 房间内第一屏直接是场地效果：介绍区和当前节点卡片移到顶栏与节点面板 */
+      body.in-room .topbar,body.in-room .left-rail,body.in-room .hero,body.in-room .draw-panel,body.in-room .layout .eyebrow{display:none}
+      body.in-room .layout{padding:calc(120px + env(safe-area-inset-top)) 14px calc(110px + env(safe-area-inset-bottom))}
+      body.in-room .active-head,body.in-room .side-panel{scroll-margin-top:calc(114px + env(safe-area-inset-top))}
+      .card-new{margin-left:auto;margin-right:8px;padding:2px 7px;border:1px solid rgba(118,232,255,.55);border-radius:999px;background:rgba(118,232,255,.12);color:var(--cyan);font-size:10px;letter-spacing:.08em}
+      body.in-room .toast{left:14px;right:14px;bottom:calc(94px + env(safe-area-inset-bottom));text-align:center}
+      body.in-room .m-topbar{position:fixed;z-index:15;top:calc(8px + env(safe-area-inset-top));left:14px;right:14px;display:flex;flex-direction:column;align-items:stretch;gap:5px;height:auto;padding:7px 8px 8px 16px;border:1px solid rgba(160,220,255,.18);border-radius:26px;background:rgba(14,28,46,.72);backdrop-filter:blur(22px) saturate(1.6);-webkit-backdrop-filter:blur(22px) saturate(1.6);box-shadow:0 12px 32px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.08)}
+      .tb-row{display:flex;align-items:center;gap:8px}
+      .tb-room{flex:1;min-width:0;display:flex;align-items:center;gap:7px}
+      .tb-room small{color:var(--muted);font-size:11px}
+      .tb-room strong{color:var(--gold);font:600 20px/1 Georgia,"Microsoft YaHei",serif;letter-spacing:.14em}
+      .m-sync-dot{width:6px;height:6px;flex:none;border-radius:50%;background:#9ff0c2;box-shadow:0 0 8px #9ff0c2}
+      .m-sync.offline .m-sync-dot{background:var(--danger);box-shadow:0 0 8px var(--danger)}
+      .m-sync.offline .m-sync-text{display:inline;color:var(--danger)}
+      .m-sync-text{display:none}
+      .tb-track{display:flex;align-items:center;width:100%;min-width:0;min-height:26px;margin:0;padding:0 8px 0 0;border:0;background:none;color:var(--muted);font-size:12px;text-align:left;cursor:pointer}
+      .tb-track:active{opacity:.85}
+      .tb-step{display:flex;align-items:center;min-width:0;flex:0 1 auto}
+      .tb-step+.tb-step{flex:1 1 auto}
+      .tb-step+.tb-step:before{content:"";flex:1 1 14px;min-width:10px;margin:0 6px;border-top:1px dashed rgba(142,164,191,.45)}
+      .tb-step.done:before,.tb-step.current:before{border-top:1.5px solid rgba(249,203,107,.65)}
+      .tb-node{display:flex;align-items:center;gap:4px;min-width:0}
+      .tb-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .tb-node i{width:7px;height:7px;flex:none;border:1px solid rgba(142,164,191,.6);border-radius:50%}
+      .tb-node .m-ico{width:13px;height:13px;stroke-width:2.2}
+      .tb-step.done{color:rgba(249,203,107,.92)}
+      .tb-step.current .tb-node{flex:none;padding:3px 9px 3px 7px;border:1px solid rgba(118,232,255,.45);border-radius:999px;background:rgba(118,232,255,.12);color:var(--cyan);font-weight:600}
+      .tb-step.current i{border:0;background:var(--cyan);box-shadow:0 0 8px rgba(118,232,255,.8)}
+      .tb-track.compact .tb-step:not(.current) .tb-name{display:none}
+      .m-top-btn{height:40px;min-width:40px;display:inline-flex;align-items:center;justify-content:center;gap:5px;flex:none;padding:0 10px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.04);color:var(--muted);font-size:12px;cursor:pointer}
+      .m-top-btn .m-ico{width:18px;height:18px}
+      .m-top-btn:active{background:rgba(118,232,255,.1);color:var(--ink)}
+      .m-top-btn:disabled{opacity:.4}
+      .m-top-btn.leave{border-color:rgba(255,130,157,.3);color:#ffacbf}
+      .m-top-btn.leave:active{background:rgba(255,130,157,.1)}
+      body.in-room .m-dock{position:fixed;z-index:15;left:14px;right:14px;bottom:calc(10px + env(safe-area-inset-bottom));display:flex;align-items:flex-end;gap:10px}
+      /* 底栏与抽取按钮之间的缝隙会透出正文，垫一层渐隐遮罩 */
+      body.in-room .m-dock:before{content:"";position:fixed;z-index:-1;left:0;right:0;bottom:0;height:calc(110px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(to bottom,rgba(6,15,27,0),rgba(6,15,27,.86) 45%,rgba(6,15,27,.94))}
+      .m-dock-bar{flex:1;min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));height:62px;padding:5px;border:1px solid rgba(160,220,255,.18);border-radius:999px;background:rgba(14,28,46,.72);backdrop-filter:blur(22px) saturate(1.6);-webkit-backdrop-filter:blur(22px) saturate(1.6);box-shadow:0 14px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08)}
+      .m-dock-item{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;padding:0;border:0;border-radius:999px;background:transparent;color:var(--muted);font-size:10px;cursor:pointer;transition:background .2s,color .2s}
+      .m-dock-item:active{background:rgba(255,255,255,.07);color:var(--cyan)}
+      .m-badge{position:absolute;top:3px;left:calc(50% + 7px);min-width:16px;height:16px;padding:0 4px;border:1px solid rgba(118,232,255,.4);border-radius:999px;background:#0b2233;color:var(--cyan);font:600 9px/14px Inter,sans-serif;text-align:center}
+      .m-badge:empty{display:none}
+      .m-dock-draw{position:relative;width:72px;height:72px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0;border:1px solid rgba(118,232,255,.7);border-radius:50%;background:radial-gradient(circle at 50% 38%,rgba(118,232,255,.42),rgba(24,88,120,.55) 58%,rgba(10,26,44,.95));box-shadow:0 14px 34px rgba(0,0,0,.45),0 0 24px rgba(58,196,236,.3),inset 0 0 18px rgba(118,232,255,.22);color:#e6fbff;font-size:12px;cursor:pointer;transition:transform .15s}
+      .m-dock-draw .m-ico{width:28px;height:28px}
+      .m-dock-draw:active{transform:scale(.94)}
+      .m-dock-draw.hint:after{content:"";position:absolute;inset:-7px;border:2px solid rgba(118,232,255,.75);border-radius:50%;pointer-events:none;animation:drawRing 1.8s ease-out infinite}
+      .m-dock-draw.settle{border-color:rgba(249,203,107,.78);background:radial-gradient(circle at 50% 38%,rgba(249,203,107,.4),rgba(120,82,28,.55) 58%,rgba(10,26,44,.95));box-shadow:0 14px 34px rgba(0,0,0,.45),0 0 24px rgba(249,203,107,.28),inset 0 0 18px rgba(249,203,107,.2);color:#fff4d6}
+      .m-dock-draw:disabled{cursor:not-allowed;filter:grayscale(.75);opacity:.5}
+      .m-avatar{width:22px;height:22px;display:grid;place-items:center;border:1px solid rgba(249,203,107,.6);border-radius:50%;background:linear-gradient(145deg,#46382b,#10263a);color:var(--gold);font:12px/1 Georgia,"Microsoft YaHei",serif}
+      /* 节点面板：底部弹出，列出每个节点的状态和已抽到的卡 */
+      .m-sheet.open{position:fixed;inset:0;z-index:25;display:flex;align-items:flex-end;background:rgba(2,7,15,.6)}
+      .m-sheet-panel{width:100%;max-height:78dvh;overflow-y:auto;padding:16px 16px calc(18px + env(safe-area-inset-bottom));border:1px solid rgba(160,220,255,.18);border-bottom:0;border-radius:22px 22px 0 0;background:linear-gradient(160deg,rgba(18,36,58,.98),rgba(7,16,29,.98));box-shadow:0 -18px 50px rgba(0,0,0,.45);animation:sheetUp .24s ease-out}
+      .m-sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+      .m-sheet-head h2{margin:0;font:400 20px Georgia,"Microsoft YaHei",serif}
+      .m-sheet-close{width:40px;height:40px;display:grid;place-items:center;flex:none;padding:0;border:1px solid var(--line);border-radius:50%;background:rgba(255,255,255,.04);color:var(--muted);cursor:pointer}
+      .m-sheet-close .m-ico{width:18px;height:18px}
+      .m-node-list{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+      .m-node{display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;align-items:start;padding:12px;border:1px solid rgba(142,164,191,.16);border-radius:14px;background:rgba(255,255,255,.025)}
+      .m-node.current{border-color:rgba(118,232,255,.45);background:rgba(118,232,255,.07)}
+      .m-node-dot{width:30px;height:30px;display:grid;place-items:center;border:1px solid rgba(142,164,191,.45);border-radius:50%;color:var(--muted);font-size:11px}
+      .m-node-dot .m-ico{width:16px;height:16px}
+      .m-node.done .m-node-dot{border-color:rgba(249,203,107,.7);color:var(--gold)}
+      .m-node.current .m-node-dot{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 14px rgba(118,232,255,.3)}
+      .m-node-title{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px}
+      .m-node-tag{flex:none;padding:2px 8px;border:1px solid rgba(142,164,191,.3);border-radius:999px;color:var(--muted);font-size:10px}
+      .m-node.done .m-node-tag{border-color:rgba(249,203,107,.4);color:var(--gold)}
+      .m-node.current .m-node-tag{border-color:rgba(118,232,255,.45);color:var(--cyan)}
+      .m-node-desc{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.6}
+      .m-sheet-note{margin:12px 0 0;padding:10px 12px;border-left:2px solid var(--gold);background:rgba(249,203,107,.06);color:var(--gold);font-size:12px;line-height:1.6}
+      .m-sheet-note:empty{display:none}
+      /* 场地卡按抽取顺序排成两列；完整说明和操作留在放大视图。 */
+      body.in-room .active-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+      body.in-room .active-grid>.slot,body.in-room .active-grid>.empty-state,body.in-room .active-grid>.room-invite{grid-column:1/-1}
+      body.in-room .active-grid>.hex-card{height:188px;min-height:0;display:flex;flex-direction:column}
+      body.in-room .active-grid .card-top{flex:none;padding:9px 9px 0;font-size:9px}
+      body.in-room .active-grid .card-new{margin-right:4px;padding:1px 5px;font-size:9px}
+      body.in-room .active-grid .card-art{flex:none;height:47px}
+      body.in-room .active-grid .card-art:before{width:34px;height:34px}
+      body.in-room .active-grid .card-art:after{width:23px;height:23px}
+      body.in-room .active-grid .glyph{font-size:20px}
+      body.in-room .active-grid .art-card .card-art{height:54px}
+      body.in-room .active-grid .card-body{display:flex;flex:1;min-height:0;flex-direction:column;padding:0 9px 8px;overflow:hidden}
+      body.in-room .active-grid .card-name{margin:0 0 4px;font-size:15px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      body.in-room .active-grid .card-effect{min-height:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:10px;line-height:1.45}
+      body.in-room .active-grid .card-result{margin:0 0 4px;padding:0;border:0;background:none}
+      body.in-room .active-grid .card-result-label,body.in-room .active-grid .card-result small{display:none}
+      body.in-room .active-grid .card-result strong{font-size:13px;line-height:1.25}
+      body.in-room .active-grid .card-result-grid{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:10px}
+      body.in-room .active-grid .card-result-grid span{padding:0;background:none}
+      body.in-room .active-grid .card-result-grid span+span:before{content:" · "}
+      body.in-room .active-grid .turn-timer{display:flex;align-items:baseline;gap:3px;margin:4px 0 0;padding:0;border:0;background:none;box-shadow:none}
+      body.in-room .active-grid .turn-timer-head,body.in-room .active-grid .turn-timer-btn{display:none}
+      body.in-room .active-grid .turn-timer-display{margin:0;gap:2px}
+      body.in-room .active-grid .turn-timer-value{font-size:17px}
+      body.in-room .active-grid .turn-timer-unit{font-size:9px}
+      body.in-room .active-grid .card-foot{margin-top:auto;padding-top:5px;font-size:9px}
+      body.in-room .active-grid .card-foot span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      body.in-room .active-grid .card-hint,body.in-room .active-grid .card-viewer-link{display:none}
+    }
+    @keyframes drawRing{0%{transform:scale(.92);opacity:.9}70%,100%{transform:scale(1.15);opacity:0}}
+    @keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
+    @media(prefers-reduced-motion:reduce){.m-sheet-panel{animation:none}.m-dock-draw.hint:after{animation:none;opacity:.8}}
   </style>
 </head>
 <body>
+  <svg class="m-icons" aria-hidden="true" focusable="false">
+    <symbol id="i-nodes" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="19" cy="12" r="2.2"/><path d="M7.2 12h2.6M14.2 12h2.6"/></symbol>
+    <symbol id="i-codex" viewBox="0 0 24 24"><rect x="4.5" y="3.5" width="11" height="15" rx="2"/><path d="M8.5 20.5h9a2 2 0 0 0 2-2v-11"/><path d="M10 7.8l1.7 2.2-1.7 2.2-1.7-2.2z"/></symbol>
+    <symbol id="i-draw" viewBox="0 0 24 24"><path d="M12 3l7 9-7 9-7-9z"/><path d="M12 8l3 4-3 4-3-4z"/></symbol>
+    <symbol id="i-settle" viewBox="0 0 24 24"><path d="M12 3l7 9-7 9-7-9z"/><path d="M9 12.2l2.1 2.1L15.2 10"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4.5v3.8h3.8"/><path d="M12 8v4.3l2.8 1.7"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.7-3.2 2.9-5 5.5-5s4.8 1.8 5.5 5"/><path d="M15.5 5.6a3 3 0 0 1 0 5.8M17.5 14.4c1.6.6 2.7 2.2 3 4.6"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 7l10 10M17 9v8H9"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4.5v3.8h-3.8"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.5L12 4l8 6.5"/><path d="M6 9v10h12V9"/><path d="M10 19v-5h4v5"/></symbol>
+    <symbol id="i-hex" viewBox="0 0 24 24"><path d="M12 3l7.8 4.5v9L12 21l-7.8-4.5v-9z"/><path d="M12 8.2l1.2 2.6 2.6 1.2-2.6 1.2L12 15.8l-1.2-2.6L8.2 12l2.6-1.2z"/></symbol>
+    <symbol id="i-pool" viewBox="0 0 24 24"><path d="M12 4l8 4-8 4-8-4z"/><path d="M4 12l8 4 8-4"/><path d="M4 16l8 4 8-4"/></symbol>
+    <symbol id="i-exit" viewBox="0 0 24 24"><path d="M14 4.5H7a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h7"/><path d="M11 12h9M17 8.5l3.5 3.5-3.5 3.5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  </svg>
   <div class="app">
+    <header class="m-topbar" aria-label="房间状态">
+      <div class="tb-row">
+        <div class="tb-room">
+          <small>房间</small><strong id="mRoomId">----</strong>
+          <span class="m-sync" id="mSync"><span class="m-sync-dot"></span><span class="m-sync-text" id="mSyncText">连接中…</span></span>
+        </div>
+        <button class="m-top-btn" id="mResetBtn" type="button" aria-label="重置本局" title="重置本局"><svg class="m-ico" aria-hidden="true"><use href="#i-reset"/></svg></button>
+        <button class="m-top-btn leave" id="mLeaveBtn" type="button"><svg class="m-ico" aria-hidden="true"><use href="#i-exit"/></svg>退出</button>
+      </div>
+      <button class="tb-track" id="mTrack" type="button" aria-label="节点进度" data-action="openNodes"></button>
+    </header>
+    <nav class="m-dock" aria-label="房间操作">
+      <div class="m-dock-bar">
+        <button class="m-dock-item" id="mNodesBtn" type="button" aria-haspopup="dialog" aria-controls="nodeSheet"><svg class="m-ico" aria-hidden="true"><use href="#i-nodes"/></svg><span>节点</span></button>
+        <button class="m-dock-item" id="mCodexBtn" type="button"><svg class="m-ico" aria-hidden="true"><use href="#i-codex"/></svg><span>图鉴</span></button>
+        <button class="m-dock-item" id="mHistoryBtn" type="button"><svg class="m-ico" aria-hidden="true"><use href="#i-history"/></svg><span class="m-badge" id="mHistoryBadge"></span><span>记录</span></button>
+      </div>
+      <button class="m-dock-draw" id="mDrawBtn" type="button" aria-label="抽取海克斯"><svg class="m-ico" aria-hidden="true"><use id="mDrawIcon" href="#i-draw"/></svg><span id="mDrawLabel">抽取</span></button>
+    </nav>
     <header class="topbar">
       <div class="brand">
         <div class="brand-mark"><span>✦</span></div>
@@ -289,9 +513,6 @@
             <p class="subtle">全桌共享一个海克斯池。每个节点随机翻出一张卡，抽到的规则立即写入场地，所有玩家都能看见。</p>
           </div>
           <div class="status-pill"><span class="status-dot"></span><span id="currentPhaseLabel">开局 · 换三张前</span></div>
-          <div class="mobile-phase-panel" aria-label="抽取节点">
-            <div class="mobile-phase-list" id="mobilePhaseList"></div>
-          </div>
         </section>
 
         <section class="draw-panel">
@@ -305,7 +526,7 @@
         </section>
 
         <section>
-          <div class="active-head"><div><div class="eyebrow">Live board</div><h2>本局场地效果</h2></div><span id="activeCount">暂无生效效果</span></div>
+          <div class="active-head"><div><div class="eyebrow">Live board</div><h2>本局场地效果</h2><p class="room-pool-label" id="activePoolLabel" hidden></p></div><span id="activeCount">暂无生效效果</span></div>
           <div class="active-grid" id="activeGrid"><div class="empty-state">场地还没有被改写。抽出第一张海克斯，让牌局开始偏离预定轨道。</div></div>
         </section>
       </main>
@@ -326,8 +547,7 @@
   <div class="lobby-screen" id="lobbyScreen" role="dialog" aria-modal="true" aria-labelledby="lobbyTitle">
     <div class="lobby-shell">
       <div class="lobby-brand"><div class="lobby-brand-mark"><span>✦</span></div><div><div class="eyebrow">Shared field augments</div><h1 class="lobby-title" id="lobbyTitle">进入海克斯麻将</h1></div></div>
-      <p class="lobby-subtitle">创建或加入一个房间后，才能查看和抽取本局海克斯。房间内的所有操作会实时同步给同桌玩家。</p>
-      <div class="lobby-account-bar"><span id="accountStatus">游客模式 · 使用官方川麻卡池</span><a class="lobby-account-link" href="./studio.html">账号与卡池工坊</a></div>
+      <p class="lobby-subtitle">创建或加入一个房间后即可开始。不登录也能使用官方川麻卡池，登录后可选择自己的卡池，所有操作实时同步给同桌玩家。</p>
       <div class="lobby-actions">
         <button class="lobby-action-btn gold" id="createRoomActionBtn" type="button">
           <span class="lobby-action-icon" aria-hidden="true">＋</span>
@@ -352,17 +572,32 @@
         </section>
       </div>
       <div class="lobby-status" id="lobbyStatus" aria-live="polite"></div>
-      <div class="lobby-foot"><span>房间 30 分钟没有牌局操作会自动删除。</span><span>关闭页面后可在 60 秒内自动恢复房间。</span></div>
+      <div class="lobby-foot"><span>房间 10 分钟没有牌局操作会自动删除。</span><span>锁屏或短暂断线保留席位 10 分钟，可自动恢复；10 分钟没有牌局操作仍会删除房间。</span></div>
     </div>
+    <nav class="lobby-tabbar" aria-label="主导航">
+      <a class="lobby-tab" href="./" aria-current="page"><svg class="m-ico" aria-hidden="true"><use href="#i-home"/></svg><span>大厅</span></a>
+      <a class="lobby-tab" href="./studio.html#cards"><svg class="m-ico" aria-hidden="true"><use href="#i-hex"/></svg><span>我的海克斯</span></a>
+      <a class="lobby-tab" href="./studio.html#pools"><svg class="m-ico" aria-hidden="true"><use href="#i-pool"/></svg><span>我的卡池</span></a>
+      <a class="lobby-tab" href="./studio.html#home"><svg class="m-ico" aria-hidden="true"><use href="#i-user"/></svg><span>我的</span></a>
+    </nav>
   </div>
 
   <div class="modal room-modal" id="roomModal" role="dialog" aria-modal="true" aria-labelledby="roomModalTitle" aria-hidden="true">
     <div class="room-dialog">
       <div class="room-dialog-head"><div><div class="eyebrow">Room access</div><h2 id="roomModalTitle">创建房间</h2></div><button class="room-dialog-close" id="closeRoomModal" type="button" aria-label="关闭">×</button></div>
-      <p id="roomModalDescription">设置一个 6 位数字密码，系统会自动生成房间号。</p>
+      <p id="roomModalDescription">选择本局卡池并设置 6 位数字密码，系统会自动生成房间号。</p>
       <form class="room-modal-form" id="roomModalForm">
         <label id="roomModalIdLabel" hidden>房间号<input id="roomModalId" inputmode="numeric" autocomplete="off" maxlength="4" pattern="[0-9]{4}" placeholder="4 位房间号"></label>
-        <label id="roomPoolLabel">本局卡池<select id="roomPoolSelect"><option value="">官方川麻卡池</option></select></label>
+        <div class="room-pool-field" id="roomPoolField">
+          <label id="roomPoolLabel" for="roomPoolTrigger">本局卡池</label>
+          <select id="roomPoolSelect" hidden aria-hidden="true" tabindex="-1"><option value="">官方川麻卡池</option></select>
+          <div class="room-pool-picker" id="roomPoolPicker">
+            <button class="room-pool-trigger" id="roomPoolTrigger" type="button" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="roomPoolOptions" aria-labelledby="roomPoolLabel roomPoolName" aria-describedby="roomPoolSummary roomPoolStatus"><svg class="m-ico" aria-hidden="true"><use href="#i-pool"/></svg><span class="room-pool-name" id="roomPoolName">官方川麻卡池</span><span class="room-pool-chevron" aria-hidden="true"></span></button>
+            <div class="room-pool-options" id="roomPoolOptions" role="listbox" aria-labelledby="roomPoolLabel" hidden></div>
+          </div>
+          <div class="room-pool-summary" id="roomPoolSummary"></div>
+          <div class="room-pool-status" id="roomPoolStatus" aria-live="polite"></div>
+        </div>
         <label>房间密码<input id="roomModalPassword" type="password" inputmode="numeric" autocomplete="current-password" maxlength="6" pattern="[0-9]{6}" placeholder="6 位数字密码" required></label>
         <div class="room-modal-error" id="roomModalError" aria-live="polite"></div>
         <button class="room-modal-submit" id="roomModalSubmit" type="submit">创建房间</button>
@@ -389,11 +624,18 @@
       <div class="catalog-grid" id="catalogGrid"></div>
     </div>
   </div>
+  <div class="m-sheet" id="nodeSheet" role="dialog" aria-modal="true" aria-labelledby="nodeSheetTitle" aria-hidden="true">
+    <div class="m-sheet-panel">
+      <div class="m-sheet-head"><h2 id="nodeSheetTitle">抽取节点</h2><button class="m-sheet-close" id="closeNodeSheet" type="button" aria-label="关闭"><svg class="m-ico" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+      <ol class="m-node-list" id="nodeSheetList"></ol>
+      <p class="m-sheet-note" id="nodeSheetNote"></p>
+    </div>
+  </div>
   <div class="toast" id="toast"></div>
 
   <script>
     const officialCards = [
-      {id:"P01",name:"百变财神",tags:["any"],effect:"本局随机指定一种牌面作为万能牌，该牌可以在胡牌时代替任意牌。",scope:"本局",glyph:"✦"},
+      {id:"P01",name:"百变财神",tags:["any"],effect:"本局随机指定一种牌面作为万能牌，该牌可以在胡牌时代替任意牌。",scope:"本局",glyph:"✦",conflicts:["P33"]},
       {id:"P02",name:"巨人之握",tags:["opening"],effect:"本局基础手牌增加到 16 张，胡牌改为五组面子加一对将牌。",scope:"本局",glyph:"◆",conflictGroups:["hand-size"]},
       {id:"P03",name:"番倍狂潮",tags:["any"],effect:"本局所有操作的番数 ×2。",scope:"本局",glyph:"×"},
       {id:"P04",name:"盲盒对换",tags:["opening"],effect:"换三张时，改为双方盲选对家手牌中的三张，交换所选牌。",scope:"本局",glyph:"◇",conflictGroups:["exchange-rule"]},
@@ -407,11 +649,11 @@
       {id:"P12",name:"彩虹顺子",tags:["any"],effect:"本局顺子不限制花色，只要点数连续即可，例如三万、四筒、五条。",scope:"本局",glyph:"✧"},
       {id:"P13",name:"宽容将眼",tags:["any"],effect:"本局胡牌时，将牌只要求点数相同，不限制花色。",scope:"本局",glyph:"◉"},
       {id:"P14",name:"迷你麻将",tags:["opening"],effect:"本局基础手牌减少到 10 张，胡牌改为三组面子加一对将牌。",scope:"本局",glyph:"▽",conflictGroups:["hand-size"]},
-      {id:"P15",name:"有吃有喝",tags:["any"],effect:"本局允许吃上一家的弃牌，组成顺子并亮出，吃牌后照常出牌。",scope:"本局",glyph:"⌁"},
+      {id:"P15",name:"有吃有喝",tags:["any"],effect:"本局允许吃上一家的弃牌，组成顺子并亮出，吃牌后照常出牌。",scope:"本局",glyph:"⌁",conflicts:["N03"]},
       {id:"P16",name:"换五乾坤",tags:["opening"],effect:"本局“换三张”升级为“换五张”，每人从手牌中任选五张交换，不要求同一门。",scope:"本局",glyph:"Ⅴ",conflictGroups:["exchange-rule"]},
       {id:"P17",name:"定缺重抽",tags:["any"],effect:"本局摸牌时，若摸到自己定缺的门类，可以将该牌置入牌山底部并重新摸一张。",scope:"本局",glyph:"↻",conflicts:["P19"]},
-      {id:"P18",name:"血战到底",tags:["any"],effect:"抽出后本局进入血战模式：玩家胡牌后不能下桌，可以继续摸牌、出牌和再次胡牌，但不能重新换牌。",scope:"本局",glyph:"♠",conflictGroups:["win-mode"]},
-      {id:"P19",name:"完美无缺",tags:["opening"],effect:"本局不需要定缺。",scope:"本局",glyph:"○",conflicts:["P17","N06","P43","P44"]},
+      {id:"P18",name:"血战到底",tags:["any"],effect:"抽出后本局进入血战模式：玩家胡牌后不能下桌，可以继续摸牌、出牌和再次胡牌，但不能重新换牌。",scope:"本局",glyph:"♠",conflictGroups:["win-mode"],conflicts:["N03"]},
+      {id:"P19",name:"完美无缺",tags:["opening"],effect:"本局不需要定缺。",scope:"本局",glyph:"○",conflicts:["P17","N06","P44"]},
       {id:"P20",name:"碰碰生财",tags:["any"],effect:"本局每次碰牌，获得额外 1 番。",scope:"本局",glyph:"✣"},
       {id:"P21",name:"天堂制造",tags:["any"],effect:"除碰牌外，本局的摸牌和弃牌将重复一次。",scope:"本局",glyph:"Ⅱ",conflicts:["R02"]},
       {id:"P22",name:"屁胡王中王",tags:["any"],effect:"本局屁胡的番数固定为 4 番。",scope:"本局",glyph:"♛"},
@@ -421,32 +663,31 @@
       {id:"P26",name:"众神之父赐予我视野",tags:["any"],effect:"本局亮出牌墙上方一列的牌。",scope:"本局",glyph:"◫"},
       {id:"P27",name:"反悔",tags:["any"],effect:"本局任意玩家的弃牌被碰或杠时，可以悔棋一次并获得番数加 1。",scope:"本局",glyph:"↶"},
       {id:"P28",name:"败者翻身",tags:["any"],effect:"本局每次有人碰牌、杠牌或胡牌时，当前筹码最少的玩家获得 1 番。",scope:"本局",glyph:"↑"},
-      {id:"P29",name:"牌型继承",tags:["any"],effect:"本局胡牌时，若此前已经出现过相同牌型的胡牌，则继承该牌型此前结算的番数。",scope:"本局",glyph:"◌"},
+      {id:"P29",name:"牌型继承",tags:["any"],effect:"本局胡牌时，若此前已经出现过相同牌型的胡牌，则继承该牌型此前结算的番数。",scope:"本局",glyph:"◌",conflicts:["P41"]},
       {id:"P30",name:"亡羊补牢",tags:["any"],effect:"本局可以用弃牌堆里的一张牌代替抽牌，一局限一次。",scope:"本局",glyph:"↩"},
       {id:"P31",name:"火力全开",tags:["opening"],effect:"本局随机抽取三张海克斯，四张效果同时生效；本局不再获得海克斯。",scope:"本局",glyph:"🔥",lockFurtherDraws:true},
       {id:"P32",name:"三花聚顶",tags:["any"],effect:"本局不同花色的条、筒、万可以组成碰牌和杠牌。",scope:"本局",glyph:"三"},
-      {id:"P33",name:"九五至尊",tags:["any"],effect:"本局所有五万、五条、五筒与九万、九条、九筒均为万能牌。",scope:"本局",glyph:"⑤"},
+      {id:"P33",name:"九五至尊",tags:["any"],effect:"本局所有五万、五条、五筒与九万、九条、九筒均为万能牌。",scope:"本局",glyph:"⑤",conflicts:["P01"]},
       {id:"P34",name:"镜像世界",tags:["any"],effect:"本局同门牌中，1 与 9、2 与 8、3 与 7、4 与 6 可以互相替代，5 不变。",scope:"本局",glyph:"◐"},
       {id:"P36",name:"杠动全场",tags:["any"],effect:"任意玩家杠牌后，所有在场玩家从牌库底各摸一张并弃一张。",scope:"本局",glyph:"⇈"},
-      {id:"P37",name:"天降甘霖",tags:["any"],effect:"所有在场玩家立即摸三张，再弃三张。",scope:"本局",glyph:"☔"},
+      {id:"P37",name:"天降甘霖",tags:["any"],effect:"每个玩家的下一次摸牌弃牌重复三次。",scope:"本局",glyph:"☔"},
       {id:"P38",name:"命运轮转",tags:["any"],effect:"所有仍在场玩家立即将整副手牌传给左手边玩家。",scope:"本局",glyph:"⟳"},
       {id:"P39",name:"死亡宣告",tags:["any"],effect:"本局听牌时，可以宣告胡牌牌张的花色；宣告后不能更换花色，以该花色的牌胡牌时番数加 4。",scope:"本局",glyph:"☠"},
       {id:"P40",name:"谁还有梦想",tags:["any"],effect:"每位玩家可以随时弃任意数量的牌，并从牌山抽取相同数量的牌；每位玩家本局限一次。",scope:"本局",glyph:"✺"},
-      {id:"P41",name:"对赌协议",tags:["any"],effect:"各玩家立即亮出两张牌；任意两名玩家经双方同意可达成对赌，双方中先胡牌者番数 ×2，倍增产生的额外筹码由对赌失败者支付。",scope:"本局",glyph:"⚖"},
+      {id:"P41",name:"对赌协议",tags:["any"],effect:"各玩家立即亮出两张牌；任意两名玩家经双方同意可达成对赌，双方中先胡牌者番数 ×2，倍增产生的额外筹码由对赌失败者支付。",scope:"本局",glyph:"⚖",conflicts:["N05","P29"]},
       {id:"P42",name:"谁能笑到最后？",tags:["opening"],effect:"本局禁止胡牌，每人支付 3 个筹码组成奖池；听牌时记录对应牌型番数，牌山摸完后按番数从高到低领取等量筹码。同番平分，无法整除时按可平分的最大数量分配，余下筹码归最高番者；本局不再抽取海克斯。",scope:"本局",glyph:"☻",conflictGroups:["win-mode"],bonusEligible:false,lockFurtherDraws:true},
-      {id:"P43",name:"小丑盒子",tags:["any"],effect:"摸到定缺牌时，必须盖牌打出并声明为同花色任意牌。谎报被证实则翻明并赔揭发者等同于场上盒子数的筹码，本局所有玩家胡你额外加 1 番；玩家按声明胡盒后翻明，声明错误则胡牌无效，声明正确则穿盒子，你赔等量筹码且该次胡牌番数 ×2。",scope:"本局",glyph:"▧",conflictGroups:["hidden-missing-suit"],conflicts:["P19"]},
-      {id:"P44",name:"无间道",tags:["any"],effect:"摸到定缺牌时，可以盖牌打出并任意声明牌名。其他玩家可质疑：成功则被质疑者赔 1 个筹码并翻明，失败则质疑者赔 1 个筹码且保持盖牌；翻明时若质疑者因此胡牌，番数 ×2。",scope:"本局",glyph:"◑",conflictGroups:["hidden-missing-suit"],conflicts:["P19"]},
-      {id:"N01",name:"明牌",tags:["any"],effect:"本局所有玩家的手牌都公开摆放。",scope:"本局",glyph:"▦",challenge:true},
-      {id:"N03",name:"极速生死局",tags:["secondWin"],effect:"本局剩余的最后两名玩家禁止碰牌和杠牌；牌山剩余牌量直接废弃一半，强制进入极速自摸／点炮决胜。",scope:"本局",glyph:"⚡",challenge:true},
-      {id:"N05",name:"精打细算",tags:["any"],effect:"本局结算时，番数大于 4 的胡牌番数归零。",scope:"本局",glyph:"⌘",challenge:true},
+      {id:"P44",name:"无间道",tags:["any"],effect:"摸到定缺牌时，可以盖牌打出并任意声明牌名。其他玩家可质疑：成功则被质疑者赔 1 个筹码并翻明，失败则质疑者赔 1 个筹码且保持盖牌；翻明时若质疑者因此胡牌，番数 ×2。",scope:"本局",glyph:"◑",conflictGroups:["hidden-missing-suit"],conflicts:["P19","N01"]},
+      {id:"N01",name:"明牌",tags:["any"],effect:"本局所有玩家的手牌都公开摆放。",scope:"本局",glyph:"▦",challenge:true,conflicts:["P44"]},
+      {id:"N03",name:"极速生死局",tags:["secondWin"],effect:"本局剩余的最后两名玩家禁止碰牌和杠牌；牌山剩余牌量直接废弃一半，强制进入极速自摸／点炮决胜。",scope:"本局",glyph:"⚡",challenge:true,conflicts:["P18","P15"]},
+      {id:"N05",name:"精打细算",tags:["any"],effect:"本局结算时，番数大于 4 的胡牌番数归零。",scope:"本局",glyph:"⌘",challenge:true,conflicts:["N09","P41"]},
       {id:"N06",name:"定缺天谴",tags:["opening"],effect:"本局定缺门由系统随机指定，玩家不能自行选择。",scope:"本局",glyph:"☄",challenge:true,conflicts:["P19"]},
-      {id:"N07",name:"灵魂转移",tags:["any"],effect:"本局每位玩家获得或失去的筹码，都转移到其左手边玩家身上结算。",scope:"本局",glyph:"⇆",challenge:true},
-      {id:"N09",name:"车门焊死",tags:["any"],effect:"本局不能胡番数小于 4 的牌；听牌时若所有可胡牌型的番数均小于 4，则不视为听牌。",scope:"本局",glyph:"▰",challenge:true},
-      {id:"R01",name:"双人成行",tags:["opening"],effect:"本局两两组队，队内共享各自手牌信息；任一队员胡牌即代表队伍胜利，每位队员都获得等同于该次胡牌番数的筹码。",scope:"本局",glyph:"Ⅱ",conflictGroups:["win-mode"],prismatic:true},
-      {id:"R02",name:"无限火力",tags:["any"],effect:"本局每个回合限时 8 秒，期间可以重复抽一张牌并打一张牌。",scope:"本局",glyph:"∞",conflicts:["P21"],prismatic:true},
-      {id:"R03",name:"大逃杀",tags:["opening"],effect:"每家支付 4 枚筹码组成奖池；本局限时 60 秒，期间所有玩家可以在任意时间抽牌并弃牌。按胡牌先后顺序分别获得 8、6、2 枚筹码；倒计时结束时尚未胡牌的玩家平分奖池；本局不再抽取海克斯。",scope:"本局",glyph:"☢",conflictGroups:["win-mode"],bonusEligible:false,lockFurtherDraws:true,prismatic:true},
-      {id:"R04",name:"静水监狱",tags:["opening"],effect:"本局不能碰牌、杠牌，也不能点炮，只能自摸；第一位胡牌的玩家番数加 4 并立刻结束本局；本局不再抽取海克斯。",scope:"本局",glyph:"▣",challenge:true,bonusEligible:false,lockFurtherDraws:true,prismatic:true},
-      {id:"R05",name:"没时间废话了",tags:["any"],effect:"本局每个人的回合必须在 7 秒内结束，超时则赔给在场玩家一人一个筹码。",scope:"本局",glyph:"⏱",challenge:true,prismatic:true},
+      {id:"N07",name:"灵魂转移",tags:["settlement"],effect:"仅在本局最终结算时概率触发：四名玩家的本局净输赢同时转交给各自开局座位左手边的玩家。",scope:"结算奇迹",glyph:"⇆",challenge:true,chance:0.03},
+      {id:"N09",name:"车门焊死",tags:["any"],effect:"本局不能胡番数小于 4 的牌；听牌时若所有可胡牌型的番数均小于 4，则不视为听牌。",scope:"本局",glyph:"▰",challenge:true,conflicts:["N05"]},
+      {id:"R01",name:"双人成行",tags:["opening"],effect:"本局两两组队，队内共享各自手牌信息；任一队员胡牌即代表队伍胜利，每位队员都获得等同于该次胡牌番数的筹码。",scope:"本局",glyph:"Ⅱ",prismatic:true,conflictGroups:["win-mode"],bonusEligible:false,lockFurtherDraws:true},
+      {id:"R02",name:"无限火力",tags:["any"],effect:"本局每个回合限时 8 秒，期间可以重复抽一张牌并打一张牌。",scope:"本局",glyph:"∞",prismatic:true,conflicts:["P21","R05"]},
+      {id:"R03",name:"大逃杀",tags:["opening"],effect:"每家支付 4 枚筹码组成奖池；本局限时 60 秒，期间所有玩家可以在任意时间抽牌并弃牌。按胡牌先后顺序分别获得 8、6、2 枚筹码；倒计时结束时尚未胡牌的玩家平分奖池；本局不再抽取海克斯。",scope:"本局",glyph:"☢",prismatic:true,conflictGroups:["win-mode"],bonusEligible:false,lockFurtherDraws:true},
+      {id:"R04",name:"静水监狱",tags:["opening"],effect:"本局不能碰牌、杠牌，也不能点炮，只能自摸；第一位胡牌的玩家番数加 4 并立刻结束本局；本局不再抽取海克斯。",scope:"本局",glyph:"▣",challenge:true,prismatic:true,conflictGroups:["win-mode"],bonusEligible:false,lockFurtherDraws:true},
+      {id:"R05",name:"没时间废话了",tags:["any"],effect:"本局每个人的回合必须在 7 秒内结束，超时则赔给在场玩家一人一个筹码。",scope:"本局",glyph:"⏱",challenge:true,prismatic:true,conflicts:["R02"]},
       {id:"R06",name:"败者食尘",tags:["settlement"],effect:"本局损失筹码最多的玩家(们)的结算作废。",scope:"结算奇迹",glyph:"↺",prismatic:true,chance:0.03}
     ];
     let cards=officialCards.map(card=>({...card,tags:[...(card.tags||[])]}));
@@ -461,13 +702,15 @@
     let phaseMap = Object.fromEntries(phases.map(p => [p.id,p]));
     const TURN_TIMER_SECONDS=Object.freeze({R05:7,R02:8});
     const ROUND_TIMER_SECONDS=Object.freeze({R03:60});
-    let state = {roundId:'',phase:'opening',used:[],active:[],history:[],triggered:[],locked:false,turnTimer:{started:false,endsAt:null,revision:0,cardId:null,durationSeconds:7},roundTimer:{started:false,endsAt:null,revision:0,cardId:null,durationSeconds:60},version:0};
+    let state = {roundId:'',phase:'opening',used:[],active:[],history:[],triggered:[],locked:false,turnTimer:{armed:false,started:false,endsAt:null,revision:0,cardId:null,durationSeconds:7},roundTimer:{armed:false,started:false,endsAt:null,revision:0,cardId:null,durationSeconds:60},version:0};
     let socket=null;
     let syncReady=false;
     let inRoom=false;
     let roomId='';
     let memberToken='';
     let roomInfo=null;
+    let roomPoolName='官方川麻卡池';
+    let roomInviteVisible=false;
     let serverClockOffset=0;
     const timerAudio={turn:{clock:null,ding:null},round:{clock:null,ding:null}};
     const timerObservations={turn:{key:'',remaining:null},round:{key:'',remaining:null}};
@@ -485,44 +728,41 @@
     try{savedRoom=JSON.parse(storageGet('hexMahjongRoom','null'));}catch{savedRoom=null;}
 
     const $ = id => document.getElementById(id);
-    const phaseList = $('phaseList'), mobilePhaseList = $('mobilePhaseList'), activeGrid = $('activeGrid'), history = $('history');
+    const phaseList = $('phaseList'), activeGrid = $('activeGrid'), history = $('history'), nodeSheet = $('nodeSheet');
+    const mobileQuery = matchMedia('(max-width:760px)');
     const drawBtn = $('drawBtn'), modal = $('revealModal'), revealCard = $('revealCard'), toast = $('toast'), catalogModal = $('catalogModal');
     const lobbyScreen=$('lobbyScreen'),lobbyStatus=$('lobbyStatus'),roomList=$('roomList');
     const roomModal=$('roomModal'),roomModalForm=$('roomModalForm'),roomModalIdLabel=$('roomModalIdLabel'),roomModalId=$('roomModalId'),roomModalPassword=$('roomModalPassword'),roomModalError=$('roomModalError'),roomModalSubmit=$('roomModalSubmit');
     let roomModalMode='create';
+    const roomPoolField=$('roomPoolField'),roomPoolSelect=$('roomPoolSelect'),roomPoolSummary=$('roomPoolSummary'),roomPoolStatus=$('roomPoolStatus');
+    const roomPoolPicker=$('roomPoolPicker'),roomPoolTrigger=$('roomPoolTrigger'),roomPoolOptions=$('roomPoolOptions');
+    let roomPoolLoadRevision=0;
+    let roomPoolLoading=false;
+    let availableRoomPools=[{id:'',name:'官方川麻卡池',description:'使用默认的川麻海克斯规则。',nodes:defaultPhases,cardCount:officialCards.length,drawCount:drawPoolCards.length}];
     const ROOMS_PER_PAGE=10;
     let lobbyRooms=[];
     let roomPage=1;
     const artByCard = {};
-    let lobbyAccount={user:null,pools:[]};
 
     function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
     function escapeAttr(value){return escapeHtml(value).replace(/`/g,'&#96;');}
     function cloneCards(source){return (Array.isArray(source)?source:[]).map(card=>({...card,tags:[...(Array.isArray(card.tags)?card.tags:[])]}));}
     function clonePhases(source){return (Array.isArray(source)?source:[]).map(phase=>({...phase}));}
     function applyRoomConfig(config){
+      roomPoolName=config?.poolName||'官方川麻卡池';
+      $('activePoolLabel').textContent='卡池 · '+roomPoolName;$('activePoolLabel').hidden=!inRoom;
       const nextCards=Array.isArray(config?.cards)&&config.cards.length?config.cards:officialCards;
       const nextPhases=Array.isArray(config?.phases)&&config.phases.length?config.phases:defaultPhases;
-      cards=cloneCards(nextCards);phases=clonePhases(nextPhases);phaseMap=Object.fromEntries(phases.map(phase=>[phase.id,phase]));drawPoolCards=cards.filter(card=>!card.tags?.includes('settlement'));
+      const officialById=new Map(officialCards.map(card=>[card.id,card]));
+      cards=cloneCards(nextCards).map(card=>{
+        const latest=officialById.get(card.id);
+        // 房间保存的是建房时的卡池快照；官方卡的展示文案始终跟随当前版本。
+        return latest?{...card,name:latest.name,effect:latest.effect,scope:latest.scope,glyph:latest.glyph,prismatic:latest.prismatic,challenge:latest.challenge,chance:latest.chance}:card;
+      });
+      phases=clonePhases(nextPhases);phaseMap=Object.fromEntries(phases.map(phase=>[phase.id,phase]));drawPoolCards=cards.filter(card=>!card.tags?.includes('settlement'));
       if(!phaseMap[state.phase])state.phase=phases[0]?.id||'opening';
-      mobilePhaseList?.style.setProperty('--phase-count',String(Math.max(1,Math.min(5,phases.length))));
     }
-    function renderRoomPoolOptions(){
-      const select=$('roomPoolSelect'),selected=select.value;select.replaceChildren();
-      const official=document.createElement('option');official.value='';official.textContent='官方川麻卡池 · 3 个节点';select.append(official);
-      for(const pool of lobbyAccount.pools||[]){const option=document.createElement('option');option.value=pool.id;option.textContent=pool.name+' · '+pool.nodes.length+' 个节点 · '+pool.cards.length+' 张卡';select.append(option);}
-      select.value=[...select.options].some(option=>option.value===selected)?selected:'';
-    }
-    async function loadLobbyAccount(){
-      try{
-        const meResponse=await fetch('./api/me',{credentials:'same-origin'});if(!meResponse.ok)throw new Error('账号状态加载失败');const me=await meResponse.json();
-        if(!me.user){lobbyAccount={user:null,pools:[]};$('accountStatus').textContent='游客模式 · 使用官方川麻卡池';renderRoomPoolOptions();return;}
-        const poolsResponse=await fetch('./api/pools',{credentials:'same-origin'});const poolsData=poolsResponse.ok?await poolsResponse.json():{pools:[]};
-        lobbyAccount={user:me.user,pools:Array.isArray(poolsData.pools)?poolsData.pools:[]};
-        $('accountStatus').replaceChildren(document.createTextNode('账号 '),Object.assign(document.createElement('strong'),{textContent:me.user.username}),document.createTextNode(' · '+lobbyAccount.pools.length+' 个私人卡池'));
-        renderRoomPoolOptions();
-      }catch{lobbyAccount={user:null,pools:[]};$('accountStatus').textContent='账号状态暂不可用 · 仍可使用官方卡池';renderRoomPoolOptions();}
-    }
+    // 创建时选定卡池，加入和重置均继续使用服务器保存的房间快照。
 
     // 状态以服务器广播为准；保留空函数兼容旧版初始化代码。
     function save(){}
@@ -553,6 +793,28 @@
       if(result?.kind==='bonusHexes')return '<div class="card-result"><span class="card-result-label">火力全开 · 额外三张</span><div class="card-result-grid">'+result.cards.map(item=>'<span>'+escapeHtml(item.name)+'</span>').join('')+'</div><small>这三张海克斯与本卡同时生效；本局不再进入后续抽取节点。</small></div>';
       return '';
     }
+    function comboRulesMarkup(card,phaseId){
+      if(phaseId==='catalog'||!state.active.some(item=>item.card?.id===card.id))return '';
+      const activeIds=new Set(state.active.map(item=>item.card.id));
+      const rules=[
+        {ids:['P12','P11'],text:'彩虹顺子与连跳顺子的数字集合、花色放宽可以同时适用，不继续推导新数字组合。'},
+        {ids:['P12','P10'],text:'彩虹顺子与首尾相连可以同时适用；只使用各卡明确允许的数字组合。'},
+        {ids:['P15','P10'],text:'可以吃上家打出的合法首尾相连顺子；定缺仍按实体花色判断。'},
+        {ids:['P15','P11'],text:'可以吃上家打出的合法连跳顺子；定缺仍按实体花色判断。'},
+        {ids:['P15','P12'],text:'可以吃上家打出的合法彩虹顺子；定缺仍按实体花色判断。'},
+        {ids:['P02','P16'],text:'先给四家各配 16 张，再按换五乾坤换牌；庄家最后多摸一张。'},
+        {ids:['P14','P16'],text:'先给四家各配 10 张，再按换五乾坤换牌；庄家最后多摸一张。'},
+        {ids:['P04','N01'],text:'先完成盲换和定缺，再公开手牌。'},
+        {ids:['P21','P17'],text:'两次正常摸牌各有一次定缺重抽机会；重抽不产生额外回合。'},
+        {ids:['P09','P36'],text:'先完成杠后选补牌及杠上开花判定，再执行杠动全场。'},
+        {ids:['P22','P03'],text:'屁胡基础番先改为 4，再按番倍狂潮翻倍。'},
+        {ids:['P39','N09'],text:'先独立达到 4 番听牌门槛，再宣告花色；不能预支宣告奖励。'}
+      ];
+      const sourceIds=['P06','P07','P08','P30'];
+      const notes=rules.filter(rule=>rule.ids.includes(card.id)&&rule.ids.every(id=>activeIds.has(id))).map(rule=>rule.text);
+      if(sourceIds.includes(card.id)&&sourceIds.filter(id=>activeIds.has(id)).length>1)notes.push('每次正常摸牌只选择一个来源：牌墙、集市、上一家弃牌或亡羊补牢，不能同一次多拿。');
+      return notes.length?'<div class="combo-rules"><strong>当前场地组合规则</strong>'+notes.map(note=>'<p>'+escapeHtml(note)+'</p>').join('')+'</div>':'';
+    }
     function roomNow(){return Date.now()+serverClockOffset;}
     function syncServerClock(serverTime){if(Number.isFinite(Number(serverTime)))serverClockOffset=Number(serverTime)-Date.now();}
     function activeTurnTimerSeconds(){const values=state.active.map(item=>TURN_TIMER_SECONDS[item.card?.id]).filter(Number.isFinite);return values.length?Math.min(...values):7;}
@@ -565,14 +827,22 @@
       if(!timer?.started||!Number.isFinite(Number(timer.endsAt)))return fallbackSeconds;
       return Math.max(0,Math.ceil((Number(timer.endsAt)-roomNow())/1000));
     }
-    function cardTimerMarkup(card,phaseId){
+    function timerActionLabel(config,started,armed){
+      if(started)return '↻ 重置计时';
+      return armed?'▶ 开始计时':'▶ 进入计时';
+    }
+    function cardTimerMarkup(card,phaseId,large){
       const config=timerConfig(card.id);
       if(!config||phaseId==='catalog'||!state.active.some(item=>item.card?.id===card.id))return '';
-      const timer=state[config.stateKey]||{},started=!!timer.started,remaining=timerRemaining(timer,config.seconds);
-      return '<div class="turn-timer'+(started&&remaining<=3?' urgent':'')+(started&&remaining===0?' expired':'')+'" data-card-timer data-timer-card-id="'+card.id+'" data-timer-kind="'+config.kind+'" data-timer-seconds="'+config.seconds+'">'+ 
+      const timer=state[config.stateKey]||{},armed=!!timer.armed,started=!!timer.started,remaining=timerRemaining(timer,config.seconds);
+      const modeClass=started?' running':(armed?' armed':'');
+      const timerValueMarkup='<span class="turn-timer-button-value" data-turn-timer-value>'+remaining+'</span><span class="turn-timer-button-unit">秒</span>';
+      const actionMarkup='<span class="turn-timer-button-label" data-timer-button-label>'+timerActionLabel(config,started,armed)+'</span>';
+      const initialDisplay=large&&!armed&&!started?'<div class="turn-timer-display"><strong class="turn-timer-value" data-turn-timer-value>'+remaining+'</strong><span class="turn-timer-unit">秒</span></div>':'';
+      const buttonValue=large?timerValueMarkup:'';
+      return '<div class="turn-timer'+modeClass+(started&&remaining<=3?' urgent':'')+(started&&remaining===0?' expired':'')+'" data-card-timer data-timer-card-id="'+card.id+'" data-timer-kind="'+config.kind+'" data-timer-seconds="'+config.seconds+'">'+
         '<div class="turn-timer-head"><span>'+config.label+'</span><span data-turn-timer-state>'+(started?(remaining===0?config.expired:config.running):'等待开始')+'</span></div>'+ 
-        '<div class="turn-timer-display"><strong class="turn-timer-value" data-turn-timer-value>'+remaining+'</strong><span class="turn-timer-unit">秒</span></div>'+ 
-        '<button class="turn-timer-btn" type="button" data-timer-card-id="'+card.id+'" data-timer-kind="'+config.kind+'" data-timer-action="'+(started?'reset':'start')+'">'+(started?'重置为 '+config.seconds+' 秒':'开始计时')+'</button></div>';
+        initialDisplay+(large?'<button class="turn-timer-btn" type="button" data-timer-card-id="'+card.id+'" data-timer-kind="'+config.kind+'" data-timer-action="'+(started?'reset':(armed?'start':'arm'))+'">'+buttonValue+actionMarkup+'</button>':'<div class="turn-timer-display"><strong class="turn-timer-value" data-turn-timer-value>'+remaining+'</strong><span class="turn-timer-unit">秒</span></div>')+'</div>';
     }
     function ensureTimerAudioContext(){
       const AudioContextClass=window.AudioContext||window.webkitAudioContext;
@@ -664,14 +934,16 @@
       const audioStates=new Map();
       document.querySelectorAll('[data-card-timer]').forEach(widget=>{
         const cardId=widget.dataset.timerCardId,config=timerConfig(cardId);if(!config)return;
-        const timer=state[config.stateKey]||{},active=state.active.some(item=>item.card?.id===cardId),started=active&&!!timer.started;
+        const timer=state[config.stateKey]||{},active=state.active.some(item=>item.card?.id===cardId),armed=active&&!!timer.armed,started=active&&!!timer.started;
         const remaining=timerRemaining(started?timer:null,config.seconds),exactRemaining=started?Math.max(0,(Number(timer.endsAt)-roomNow())/1000):config.seconds;
         widget.dataset.timerSeconds=String(config.seconds);
         widget.classList.toggle('urgent',started&&remaining<=3);widget.classList.toggle('expired',started&&remaining===0);
-        const value=widget.querySelector('[data-turn-timer-value]'),status=widget.querySelector('[data-turn-timer-state]'),button=widget.querySelector('[data-timer-action]');
-        if(value)value.textContent=remaining;
-        if(status)status.textContent=started?(remaining===0?config.expired:config.running):'等待开始';
-        if(button){button.dataset.timerAction=started?'reset':'start';button.textContent=started?'重置为 '+config.seconds+' 秒':'开始计时';}
+        const values=widget.querySelectorAll('[data-turn-timer-value]'),status=widget.querySelector('[data-turn-timer-state]'),button=widget.querySelector('[data-timer-action]'),reveal=widget.closest('.reveal-card');
+        values.forEach(value=>{value.textContent=remaining;});
+        if(status)status.textContent=started?(remaining===0?config.expired:config.running):(armed?'等待开始':'等待进入');
+        if(button){button.dataset.timerAction=started?'reset':(armed?'start':'arm');button.querySelector('[data-timer-button-label]')?.replaceChildren(document.createTextNode(timerActionLabel(config,started,armed)));}
+        widget.classList.toggle('armed',armed&&!started);widget.classList.toggle('running',started);
+        reveal?.classList.toggle('timer-running',started);
         audioStates.set(config.kind,{timer,started,exactRemaining});
       });
       ['turn','round'].forEach(kind=>{const item=audioStates.get(kind);updateTimerAudio(kind,item?.timer||{},!!item?.started,item?.exactRemaining??0);});
@@ -710,23 +982,23 @@
     function phaseLabel(id){const phase=phaseMap[id]||phases[0];return phase?(phase.name+(phase.desc?' · '+phase.desc:'')):'未设置节点';}
     function cardScope(card){return card.scope||'本局';}
     function cardPhaseText(card,phaseId){
-      if(card.tags?.includes('settlement'))return '结算时 · 3% 概率';
+      if(card.tags?.includes('settlement'))return card.chance>0?'结算时 · '+(card.chance*100)+'% 概率':'结算时 · 概率待定';
       if(phaseId==='catalog')return card.tags?.includes('any')?'全节点':(card.tags||[]).map(tag=>phaseMap[tag]?.name||tag).join(' / ')||'未分类';
       return phaseMap[phaseId]?.name||'';
     }
-    function cardMarkup(card,phaseId,large,activeIndex,catalogIndex){
+    function cardMarkup(card,phaseId,large,activeIndex,catalogIndex,isNew){
       const c=(card.challenge?' challenge':'')+(card.prismatic?' prismatic':'');
       const revealable=hasHiddenRandomResult(card);
       const interactive=Number.isInteger(activeIndex)||Number.isInteger(catalogIndex)||revealable;
       const art=artByCard[card.id];
       const artClass=art?' art-card':'';
       const artMarkup=art?'<img src="'+escapeAttr(art.preview)+'" alt="'+escapeAttr(card.name)+' 全息卡预览" loading="lazy">':'<span class="glyph">'+escapeHtml(card.glyph||'✦')+'</span>';
-      const viewer=art?'<a class="card-viewer-link" href="'+escapeAttr(art.viewer)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">打开 3D 闪卡 ↗</a>':'';
+      const viewer=art&&large?'<a class="card-viewer-link" href="'+escapeAttr(art.viewer)+'" target="_blank" rel="noopener">打开 3D 闪卡 ↗</a>':'';
       const dataAttr=(Number.isInteger(activeIndex)?' data-active-index="'+activeIndex+'"':'')+(Number.isInteger(catalogIndex)?' data-catalog-index="'+catalogIndex+'"':'')+(revealable?' data-reveal-id="'+escapeAttr(card.id)+'"':'');
       return '<article class="hex-card'+c+artClass+(large?' reveal-card':'')+'" data-card-id="'+escapeAttr(card.id)+'"'+(interactive?' role="button" tabindex="0"'+dataAttr+' aria-label="'+escapeAttr((revealable?'揭晓':'放大查看')+card.name)+'" aria-haspopup="dialog"':'')+'>'+
-        '<div class="card-top"><span class="card-code">'+escapeHtml(card.id)+'</span><span class="card-type">'+(card.prismatic?'PRISMATIC':(card.challenge?'CHALLENGE':'AUGMENT'))+'</span></div>'+
+        '<div class="card-top"><span class="card-code">'+escapeHtml(card.id)+'</span>'+(isNew?'<span class="card-new">新</span>':'')+'<span class="card-type">'+(card.prismatic?'PRISMATIC':(card.challenge?'CHALLENGE':'AUGMENT'))+'</span></div>'+
         '<div class="card-art">'+artMarkup+'</div>'+ 
-        '<div class="card-body"><h3 class="card-name">'+escapeHtml(card.name)+'</h3>'+resultMarkup(card)+'<p class="card-effect">'+escapeHtml(card.effect)+'</p>'+cardTimerMarkup(card,phaseId)+
+        '<div class="card-body"><h3 class="card-name">'+escapeHtml(card.name)+'</h3>'+resultMarkup(card)+'<p class="card-effect">'+escapeHtml(card.effect)+'</p>'+cardTimerMarkup(card,phaseId,large)+
         viewer+'<div class="card-foot"><span class="card-scope">'+escapeHtml(cardScope(card))+'</span><span>'+escapeHtml(cardPhaseText(card,phaseId))+'</span></div>'+(interactive?'<div class="card-hint">'+(revealable?'再次点击揭晓随机结果 ✦':'点击放大查看 ↗')+'</div>':'')+'</div></article>';
     }
     function renderPhases(){
@@ -737,15 +1009,37 @@
           '<span class="phase-dot">'+(done?'✓':String(i+1).padStart(2,'0'))+'</span>'+ 
           '<span><span class="phase-name">'+escapeHtml(p.name)+'</span><span class="phase-desc">'+escapeHtml((p.desc||'')+(done?' · 已抽取':''))+'</span></span></button>';
       }).join('');
-      [phaseList,mobilePhaseList].forEach(list=>{
-        if(!list)return;
-        list.innerHTML=markup;
-        list.querySelectorAll('[data-phase]').forEach(btn=>btn.addEventListener('click',()=>{state.phase=btn.dataset.phase;save();render();}));
-      });
+      phaseList.innerHTML=markup;
+      phaseList.querySelectorAll('[data-phase]').forEach(btn=>btn.addEventListener('click',()=>{state.phase=btn.dataset.phase;save();render();}));
+    }
+    function roomInviteMarkup(compact=false){
+      if(!inRoom||!roomId||!roomInviteVisible)return '';
+      const online=Math.max(1,Number(roomInfo?.memberCount||1));
+      const nodeCount=phases.length;
+      return '<section class="room-invite'+(compact?' compact':'')+'" aria-label="邀请朋友">'+
+        '<div class="room-invite-head"><h3>邀请朋友</h3><span class="room-online"><svg class="m-ico" aria-hidden="true"><use href="#i-users"/></svg>在线 <b>'+online+'</b> / 4</span></div>'+
+        '<div class="room-code"><div><small>房间号</small><strong>'+escapeHtml(roomId)+'</strong></div><button class="room-copy-btn" type="button" data-copy-room="'+escapeAttr(roomId)+'"><svg class="m-ico" aria-hidden="true"><use href="#i-copy"/></svg>复制</button></div>'+
+        (compact?'':'<ol class="room-invite-steps"><li>把房间号和你设置的 6 位密码发给朋友</li><li>朋友在大厅点「搜索房间」，输入房间号和密码</li><li>不需要登录，游客也能加入</li></ol>')+
+        '<div class="room-invite-foot"><span class="chip">卡池 <b>'+escapeHtml(roomPoolName)+'</b></span><span class="chip"><b>'+nodeCount+'</b> 个节点</span><span class="chip"><b>'+drawPoolCards.length+'</b> 张可抽</span></div></section>';
     }
     function renderActive(){
-      if(!state.active.length){activeGrid.innerHTML='<div class="empty-state">场地还没有被改写。抽出第一张海克斯，让牌局开始偏离预定轨道。</div>';}
-      else activeGrid.innerHTML=state.active.map((item,index)=>cardMarkup(item.card,item.phase,false,index)).join('');
+      const pending=nextPendingPhase();
+      // 开局且场上还没有卡时，显示占位卡，样式和原型一致
+      if(!state.active.length&&pending&&state.triggered.length===0){
+        const phase=pending;
+        const eligible=phaseCards(phase.id).length;
+        activeGrid.innerHTML='<section class="slot" aria-label="等待抽取的节点"><div class="slot-kicker"><span class="slot-num">01</span>当前节点 · '+escapeHtml(phase.desc||'')+'</div>'+
+          '<h3>'+escapeHtml(phase.name)+'</h3><p>'+escapeHtml(phase.detail||'抽取一张海克斯。')+'</p>'+
+          '<div class="slot-meta"><span class="chip">本节点可抽 <b>'+eligible+'</b> 张</span><span class="chip">全桌同步揭晓</span></div>'+
+          '<div class="slot-hint">点右下角<span class="mini-draw"><svg class="m-ico" aria-hidden="true"><use href="#i-draw"/></svg>抽取</span>翻开第一张<svg class="m-ico" aria-hidden="true"><use href="#i-arrow"/></svg></div></section>'+roomInviteMarkup(false);
+      }
+      else if(!state.active.length){activeGrid.innerHTML='<div class="empty-state">场地还没有被改写。抽出第一张海克斯，让牌局开始偏离预定轨道。</div>';}
+      else{
+        // 场地效果按抽取顺序排列；最后抽到的节点仍标「新」。
+        const items=state.active.map((item,index)=>({item,index}));
+        const mobile=mobileQuery.matches,latestPhase=state.active.at(-1).phase;
+        activeGrid.innerHTML=items.map(({item,index})=>cardMarkup(item.card,item.phase,false,index,undefined,mobile&&item.phase===latestPhase)).join('');
+      }
       $('activeCount').textContent=state.active.length?'已生效 '+state.active.length+' 张':'暂无生效效果';
     }
     function renderHistory(){
@@ -762,8 +1056,8 @@
       $('catalogGrid').innerHTML=groups.map(group=>'<div class="catalog-section-title '+group.className+'"><strong>'+group.title+'</strong><span>'+group.meta+' · '+group.items.length+' 张</span></div>'+group.items.map(card=>cardMarkup(card,'catalog',false,undefined,cards.indexOf(card))).join('')).join('');
     }
     function render(){
-      if(!state.turnTimer)state.turnTimer={started:false,endsAt:null,revision:0,cardId:null,durationSeconds:7};
-      if(!state.roundTimer)state.roundTimer={started:false,endsAt:null,revision:0,cardId:null,durationSeconds:60};
+      if(!state.turnTimer)state.turnTimer={armed:false,started:false,endsAt:null,revision:0,cardId:null,durationSeconds:7};
+      if(!state.roundTimer)state.roundTimer={armed:false,started:false,endsAt:null,revision:0,cardId:null,durationSeconds:60};
       const phase=phaseMap[state.phase]||phases[0]||{id:'opening',name:'开局',title:'开局海克斯',detail:'抽取一张海克斯。'}, eligible=phaseCards(phase.id), done=state.triggered.includes(phase.id);
       if(state.phase!==phase.id)state.phase=phase.id;
       const pending=nextPendingPhase();
@@ -772,7 +1066,7 @@
       const nodeCount=phases.length;
       $('currentPhaseLabel').textContent=phaseLabel(phase.id);
       $('drawTitle').textContent=resetReady?(allDrawn?'本局海克斯已集齐':'本局抽取已结束'):phase.title;
-      $('drawDescription').textContent=allDrawn?nodeCount+' 个抽取节点均已完成。线下牌局结束后点击结算；若卡池包含败者食尘，将有 3% 概率触发。':state.locked?'本局后续海克斯抽取已被封锁。线下牌局结束后即可结算。':phase.detail;
+      $('drawDescription').textContent=allDrawn?nodeCount+' 个抽取节点均已完成。线下牌局结束后点击结算，届时判定已启用的结算海克斯。':state.locked?'本局后续海克斯抽取已被封锁。线下牌局结束后即可结算。':phase.detail;
       $('eligibleCount').textContent=resetReady?0:eligible.length;
       $('cardPoolCount').textContent=drawPoolCards.length;
       $('catalogCount').textContent=cards.length;
@@ -784,8 +1078,60 @@
       drawBtn.disabled=!inRoom||!syncReady||(!resetReady&&(done||state.locked||eligible.length===0||!pending||pending.id!==state.phase));
       $('resetBtn').textContent=resetReady?'结算本局':'重置本局';
       $('resetBtn').disabled=!inRoom||!syncReady;
-      renderPhases();renderActive();renderHistory();updateTimerUi();
+      renderPhases();renderActive();renderHistory();updateTimerUi();renderMobileBars(resetReady);
       $('phaseState').textContent=!inRoom?'加入房间后才能抽取海克斯。':allDrawn?nodeCount+' 个节点均已完成，可以结算本局。':state.locked?'本局后续海克斯抽取已结束，可以结算本局。':done?'这个节点已经翻过牌了。可以点击其他节点查看状态。':(!pending||pending.id!==phase.id)?'请按顺序完成前面的节点。':'选择节点后，点击中央按钮随机翻开一张海克斯。';
+    }
+    // 悬浮栏与桌面控件共用同一套状态，这里只做镜像。
+    function renderMobileBars(resetReady){
+      const mDraw=$('mDrawBtn');
+      mDraw.disabled=drawBtn.disabled;mDraw.classList.toggle('settle',resetReady);
+      mDraw.classList.toggle('hint',roomInviteVisible&&!state.active.length&&!state.triggered.length&&!resetReady&&!mDraw.disabled);
+      $('mDrawLabel').textContent=resetReady?'结算':'抽取';mDraw.setAttribute('aria-label',resetReady?'结算本局':'抽取海克斯');
+      $('mDrawIcon').setAttribute('href',resetReady?'#i-settle':'#i-draw');
+      $('mResetBtn').disabled=$('resetBtn').disabled;
+      const resetLabel=resetReady?'结算本局':'重置本局';$('mResetBtn').setAttribute('aria-label',resetLabel);$('mResetBtn').title=resetLabel;
+      // 顶栏：节点轨道，取代原先的进度点 + 节点名
+      const pending=nextPendingPhase(),doneCount=phases.filter(p=>state.triggered.includes(p.id)).length;
+      const track=$('mTrack'),steps=phases.map((p,i)=>{
+        const isDone=state.triggered.includes(p.id),isCurrent=!state.locked&&p===pending,mark=isDone?'<svg class="m-ico" aria-hidden="true"><use href="#i-check"/></svg>':'<i></i>';
+        const cls='tb-step'+(isDone?' done':isCurrent?' current':' todo'),label=isDone?'已完成':isCurrent?'当前':'未开始';
+        return '<span class="'+cls+'"><span class="tb-node">'+mark+'<span class="tb-name">'+escapeHtml(p.name)+'</span></span></span>';
+      }).join('');
+      track.innerHTML=steps;
+      const ariaSteps=phases.map((p,i)=>p.name+' '+(state.triggered.includes(p.id)?'已完成':(!state.locked&&p===pending)?'当前':'未开始')).join('，');
+      track.setAttribute('aria-label','节点进度：'+ariaSteps+'。点击查看节点详情');
+      requestAnimationFrame(()=>{
+        track.classList.remove('compact');
+        const clipped=[...track.querySelectorAll('.tb-name')].some(n=>n.scrollWidth>n.clientWidth+1);
+        track.classList.toggle('compact',clipped);
+      });
+      $('mHistoryBadge').textContent=state.history.length||'';
+      renderNodeSheet(resetReady);
+    }
+    function renderNodeSheet(resetReady){
+      const pending=nextPendingPhase();
+      $('nodeSheetList').innerHTML=phases.map((p,i)=>{
+        const done=state.triggered.includes(p.id),current=!done&&!state.locked&&p===pending;
+        const drawn=state.active.filter(item=>item.phase===p.id).map(item=>item.card.name);
+        const tag=done?'已抽取':current?'当前':state.locked?'已锁定':'未开始';
+        const desc=done?(drawn.length?'抽到：'+drawn.join('、'):'本节点已结束'):(p.detail||p.desc||'');
+        return '<li class="m-node'+(done?' done':'')+(current?' current':'')+'"'+(current?' aria-current="step"':'')+'>'+
+          '<span class="m-node-dot" aria-hidden="true">'+(done?'<svg class="m-ico"><use href="#i-check"/></svg>':String(i+1).padStart(2,'0'))+'</span>'+
+          '<div><div class="m-node-title"><span>'+escapeHtml(p.name)+'</span><span class="m-node-tag">'+tag+'</span></div>'+
+          (desc?'<p class="m-node-desc">'+escapeHtml(desc)+'</p>':'')+'</div></li>';
+      }).join('');
+      $('nodeSheetNote').textContent=!resetReady?'':state.locked&&pending?'本局后续海克斯抽取已被封锁。线下牌局结束后点击底部的「结算」。':'所有节点均已完成。线下牌局结束后点击底部的「结算」，届时判定已启用的结算海克斯。';
+    }
+    let nodeSheetOpener=null;
+    function openNodeSheet(){
+      nodeSheetOpener=document.activeElement;
+      nodeSheet.classList.add('open');nodeSheet.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+      $('closeNodeSheet').focus();
+    }
+    function closeNodeSheet(){
+      if(!nodeSheet.classList.contains('open'))return;
+      nodeSheet.classList.remove('open');nodeSheet.setAttribute('aria-hidden','true');document.body.style.overflow='';
+      nodeSheetOpener?.focus();
     }
     function showToast(msg,duration=2600){
       toast.textContent=msg;toast.classList.add('show');clearTimeout(showToast.t);
@@ -793,6 +1139,59 @@
     }
     function setLobbyStatus(message,isError=false){lobbyStatus.textContent=message||'';lobbyStatus.classList.toggle('error',!!isError);}
     function setRoomModalError(message=''){roomModalError.textContent=message||'';}
+    function renderRoomPoolSummary(){
+      const pool=availableRoomPools.find(item=>item.id===roomPoolSelect.value)||availableRoomPools[0];
+      $('roomPoolName').textContent=pool.name;
+      roomPoolOptions.querySelectorAll('[role="option"]').forEach(option=>{const selected=option.dataset.poolId===pool.id;option.setAttribute('aria-selected',String(selected));option.querySelector('.room-pool-check').textContent=selected?'✓':'';});
+      roomPoolSummary.innerHTML='<strong>'+pool.cardCount+' 张海克斯 · '+pool.drawCount+' 张可抽 · '+pool.nodes.length+' 个节点</strong><p class="pool-nodes">'+pool.nodes.map(node=>escapeHtml(node.name)).join(' → ')+'</p>'+(pool.description?'<p>'+escapeHtml(pool.description)+'</p>':'');
+    }
+    function renderRoomPoolOptions(){
+      roomPoolOptions.replaceChildren();
+      for(const [title,pools] of [['官方卡池',availableRoomPools.slice(0,1)],['我的卡池',availableRoomPools.slice(1)]]){
+        if(!pools.length)continue;
+        const group=document.createElement('div'),label=document.createElement('div');group.className='room-pool-group';group.setAttribute('role','group');group.setAttribute('aria-label',title);label.className='room-pool-group-title';label.textContent=title;label.setAttribute('aria-hidden','true');group.append(label);
+        for(const pool of pools){
+          const option=document.createElement('button'),copy=document.createElement('span'),name=document.createElement('span'),meta=document.createElement('span'),check=document.createElement('span');
+          option.type='button';option.className='room-pool-option';option.setAttribute('role','option');option.tabIndex=-1;option.dataset.poolId=pool.id;
+          copy.className='room-pool-option-copy';name.className='room-pool-option-name';name.textContent=pool.name;meta.className='room-pool-option-meta';meta.textContent=pool.drawCount+' 张可抽 · '+pool.nodes.length+' 个节点';check.className='room-pool-check';check.setAttribute('aria-hidden','true');
+          copy.append(name,meta);option.append(copy,check);group.append(option);
+        }
+        roomPoolOptions.append(group);
+      }
+      renderRoomPoolSummary();
+    }
+    function closeRoomPoolOptions(restoreFocus=false){roomPoolOptions.hidden=true;roomPoolTrigger.setAttribute('aria-expanded','false');if(restoreFocus)roomPoolTrigger.focus();}
+    function openRoomPoolOptions(focusOption=false){
+      if(roomPoolTrigger.disabled||roomPoolField.hidden)return;
+      roomPoolOptions.hidden=false;roomPoolTrigger.setAttribute('aria-expanded','true');
+      const selected=roomPoolOptions.querySelector('[aria-selected="true"]');
+      if(focusOption)selected?.focus();
+      if(selected){const top=selected.getBoundingClientRect().top-roomPoolOptions.getBoundingClientRect().top+roomPoolOptions.scrollTop;roomPoolOptions.scrollTop=Math.max(0,top-36);}
+    }
+    async function loadRoomPools(){
+      const revision=++roomPoolLoadRevision;
+      roomPoolLoading=true;roomModalSubmit.disabled=true;roomPoolTrigger.disabled=true;closeRoomPoolOptions();
+      roomPoolStatus.textContent='正在加载我的卡池…';
+      try{
+        const response=await fetch('./api/room-pools',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(8000)});
+        const data=await response.json();if(!response.ok)throw new Error(data.message||'卡池加载失败');
+        if(revision!==roomPoolLoadRevision)return;
+        const selected=roomPoolSelect.value;availableRoomPools=data.pools;
+        const official=new Option(availableRoomPools[0].name,''),privateGroup=document.createElement('optgroup');privateGroup.label='我的卡池';
+        privateGroup.append(...availableRoomPools.slice(1).map(pool=>new Option(pool.name,pool.id)));
+        roomPoolSelect.replaceChildren(official,...(privateGroup.children.length?[privateGroup]:[]));
+        roomPoolSelect.value=availableRoomPools.some(pool=>pool.id===selected)?selected:'';renderRoomPoolOptions();
+        roomPoolStatus.innerHTML=data.user?(availableRoomPools.length>1?'房间内所有玩家共用所选卡池，重置后保留。':'还没有私人卡池。<a href="./studio.html#pools/new">创建我的卡池</a>'):'<a href="./studio.html#pools">登录后使用我的卡池</a> · 游客可直接创建官方卡池房间';
+        // 账号可能在其他标签页登录；重新握手以读取当前的账号 Cookie。
+        if(roomModalMode==='create'&&roomModal.classList.contains('open')&&!inRoom){syncReady=false;roomModalSubmit.disabled=true;connectSync();}
+      }catch{
+        if(revision!==roomPoolLoadRevision)return;
+        roomPoolStatus.replaceChildren(document.createTextNode('私人卡池加载失败，仍可使用官方卡池。'));
+        const retry=document.createElement('button');retry.type='button';retry.textContent='重试';retry.addEventListener('click',loadRoomPools);roomPoolStatus.append(retry);
+      }finally{
+        if(revision===roomPoolLoadRevision){roomPoolLoading=false;roomPoolTrigger.disabled=roomModalMode!=='create';roomModalSubmit.disabled=!syncReady;}
+      }
+    }
     let roomModalOpener=null;
     function openRoomModal(mode='create',prefillRoom=''){
       roomModalMode=mode;roomModalOpener=document.activeElement;setRoomModalError('');setLobbyStatus('');
@@ -801,17 +1200,22 @@
       $('roomModalDescription').textContent=creating?'选择本局卡池并设置 6 位数字密码，系统会自动生成房间号。':'输入 4 位房间号和 6 位数字密码，搜索并加入正在进行的房间。';
       $('roomModalSubmit').textContent=creating?'创建房间':'搜索并加入';
       roomModalIdLabel.hidden=creating;roomModalId.required=!creating;roomModalId.value=prefillRoom||'';roomModalPassword.value='';
-      $('roomPoolLabel').hidden=!creating;$('roomPoolSelect').disabled=!creating;if(creating)renderRoomPoolOptions();
+      roomPoolField.hidden=!creating;roomPoolSelect.disabled=!creating;roomPoolTrigger.disabled=!creating;closeRoomPoolOptions();
+      if(creating){availableRoomPools=availableRoomPools.slice(0,1);roomPoolSelect.replaceChildren(new Option(availableRoomPools[0].name,''));}
+      roomPoolSelect.value='';renderRoomPoolOptions();
       roomModal.classList.add('open');roomModal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
       (creating?roomModalPassword:roomModalId).focus();
+      if(creating)loadRoomPools();
     }
     function closeRoomModal(){
+      roomPoolLoadRevision+=1;roomPoolLoading=false;
+      closeRoomPoolOptions();
       roomModal.classList.remove('open');roomModal.setAttribute('aria-hidden','true');roomModalForm.reset();setRoomModalError('');roomModalSubmit.disabled=false;document.body.style.overflow='';roomModalOpener?.focus();
     }
     function showLobby(message='',isError=false){
-      inRoom=false;roomId='';memberToken='';roomInfo=null;
+      inRoom=false;roomId='';memberToken='';roomInfo=null;roomInviteVisible=false;
       applyRoomConfig(null);
-      $('roomBadge').hidden=true;$('leaveRoomBtn').hidden=true;closeRoomModal();lobbyScreen.classList.remove('hidden');setLobbyStatus(message,isError);render();
+      closeNodeSheet();$('roomBadge').hidden=true;$('leaveRoomBtn').hidden=true;document.body.classList.remove('in-room');if(syncReady)setSyncStatus('已连接大厅','online');closeRoomModal();lobbyScreen.classList.remove('hidden');setLobbyStatus(message,isError);render();
       requestAnimationFrame(()=>{lobbyScreen.scrollTop=0;roomList.scrollTop=0;});
     }
     function enterRoom(message){
@@ -819,9 +1223,13 @@
       inRoom=true;roomId=String(message.roomId||'');memberToken=String(message.memberToken||'');roomInfo=message.room||null;
       applyRoomConfig(message.config);
       if(previousRoomId!==roomId){Object.values(timerObservations).forEach(item=>{item.key='';item.remaining=null;});}
+      if(message.state)state=message.state;
+      const inviteKey='hexMahjongRoomInviteSeen:'+roomId;
+      roomInviteVisible=!storageGet(inviteKey,'')&&state.active.length===0&&state.triggered.length===0;
+      if(roomId)storageSet(inviteKey,'1');
       if(roomId&&memberToken)storageSet('hexMahjongRoom',JSON.stringify({roomId,memberToken}));
-      $('roomBadgeId').textContent=roomId;$('roomBadge').hidden=!roomId;$('leaveRoomBtn').hidden=false;closeRoomModal();lobbyScreen.classList.add('hidden');setLobbyStatus('');
-      if(message.state)state=message.state;render();
+      $('roomBadgeId').textContent=roomId;$('roomBadge').hidden=!roomId;$('leaveRoomBtn').hidden=false;$('mRoomId').textContent=roomId||'----';document.body.classList.add('in-room');if(syncReady)setSyncStatus('已同步','online');closeRoomModal();lobbyScreen.classList.add('hidden');setLobbyStatus('');
+      render();
     }
     function renderRoomPage(){
       const totalPages=Math.max(1,Math.ceil(lobbyRooms.length/ROOMS_PER_PAGE));
@@ -831,7 +1239,7 @@
       roomList.innerHTML='';
       if(!visibleRooms.length)roomList.innerHTML='<div class="room-empty">目前没有进行中的房间，创建一个开始牌局吧。</div>';
       visibleRooms.forEach(room=>{
-        const memberCount=Number(room.memberCount||0),drawnCount=Number(room.drawn||0),isFull=memberCount>=4;
+        const memberCount=Number(room.memberCount||0),drawnCount=Number(room.drawn||0),isFull=Number(room.seatCount??memberCount)>=4;
         const row=document.createElement('article');row.className='room-row'+(isFull?' full':'');
         if(!isFull){row.tabIndex=0;row.setAttribute('role','button');row.setAttribute('aria-label','加入房间 '+room.id);}
         const top=document.createElement('div');top.className='room-card-top';
@@ -871,7 +1279,7 @@
       const settlementReady=state.locked||phases.every(item=>state.triggered.includes(item.id));
       const prompt=settlementReady?'确认线下牌局已经结束并完成筹码结算吗？确认后将结算本局并进入下一局。':'确定提前清空本局的抽取记录和场地效果吗？提前重置不会触发结算奇迹。';
       if(!confirm(prompt))return;
-      drawBtn.disabled=true;$('resetBtn').disabled=true;
+      drawBtn.disabled=true;$('resetBtn').disabled=true;$('mDrawBtn').disabled=true;$('mResetBtn').disabled=true;
       socket.send(JSON.stringify({type:settlementReady?'settle':'reset',roundId:state.roundId||''}));
     }
     function draw(){
@@ -881,7 +1289,7 @@
       if(!syncReady||!socket||socket.readyState!==WebSocket.OPEN)return;
       const pending=nextPendingPhase();
       if(!pending||pending.id!==state.phase||state.locked)return;
-      drawBtn.disabled=true;
+      drawBtn.disabled=true;$('mDrawBtn').disabled=true;
       socket.send(JSON.stringify({type:'draw',phase:pending.id}));
     }
     function requestRandomReveal(cardId){
@@ -894,9 +1302,14 @@
     }
     let modalOpener=null;
     let modalReturnToCatalog=false;
+    let modalFromDraw=false;
+    let settlementModalCards=[];
+    let settlementModalIndex=0;
     function openCardModal(card,phaseId,isDraw){
       const fromCatalog=phaseId==='catalog';
       const showHoloDetail=card.id==='R06'&&(!isDraw||phaseId==='settlement');
+      modalFromDraw=isDraw&&phaseId!=='settlement';
+      closeNodeSheet();
       if(catalogModal.classList.contains('open'))closeCatalog();
       if(!modal.classList.contains('open'))modalOpener=document.activeElement;
       modalReturnToCatalog=fromCatalog;
@@ -908,7 +1321,7 @@
       $('closeModal').textContent=isDraw?'收下这条命运':(fromCatalog?'返回图鉴':'返回场地');
       revealCard.innerHTML=showHoloDetail
         ?'<div class="holo-detail-view"><iframe class="holo-detail-frame" src="./artifacts/bai-zhe-shi-chen/web/index.html?embed=1&v=20260915-2" title="败者食尘全息闪卡" loading="eager"></iframe></div>'
-        :cardMarkup(card,phaseId,true);
+        :cardMarkup(card,phaseId,true)+comboRulesMarkup(card,phaseId);
       modal.classList.add('open');modal.setAttribute('aria-hidden','false');
       document.body.style.overflow='hidden';
       if(showHoloDetail){
@@ -918,7 +1331,28 @@
       $('closeModal').focus();
       if(!showHoloDetail)requestAnimationFrame(()=>requestAnimationFrame(()=>revealCard.querySelector('.reveal-card')?.classList.add('show')));
     }
+    function openSettlementModal(settlementCards){
+      const cardsForModal=Array.isArray(settlementCards)?settlementCards.filter(Boolean):[];
+      if(!cardsForModal.length)return;
+      settlementModalCards=cardsForModal;settlementModalIndex=0;
+      showSettlementModalCard();
+    }
+    function showSettlementModalCard(){
+      const card=settlementModalCards[settlementModalIndex];
+      if(!card)return;
+      openCardModal(card,'settlement',true);
+      if(settlementModalCards.length>1&&card.id==='N07')revealCard.insertAdjacentHTML('beforeend','<div class="combo-rules"><strong>两张结算奇迹的执行顺序</strong><p>先按败者食尘作废相关交易，再把修正后的本局净输赢转交给各自左手边玩家。</p></div>');
+      const names=settlementModalCards.map(item=>item.name).join('、');
+      $('modalTitle').textContent=settlementModalCards.length>1
+        ?'结算奇迹同时降临 · '+names+' · '+(settlementModalIndex+1)+'/'+settlementModalCards.length
+        :(card.id==='R06'?'棱彩奇迹降临 · 败者食尘':'结算奇迹降临 · '+card.name);
+      $('closeModal').textContent=settlementModalIndex<settlementModalCards.length-1?'查看下一张奇迹':'接受奇迹，进入下一局';
+    }
     function closeModal(options={}){
+      if(settlementModalIndex<settlementModalCards.length-1&&options.advanceSettlement!==false){
+        settlementModalIndex+=1;showSettlementModalCard();return;
+      }
+      settlementModalCards=[];settlementModalIndex=0;
       const shouldReturnToCatalog=modalReturnToCatalog&&options.returnToCatalog!==false;
       modalReturnToCatalog=false;
       $('resetHoloCard').hidden=true;$('resetHoloCard').disabled=true;
@@ -926,8 +1360,12 @@
       if(shouldReturnToCatalog){openCatalog();return;}
       document.body.style.overflow='';
       modalOpener?.focus();
+      // 手机端收下新卡后回到场地效果区域；缩略卡按抽取顺序排列。
+      if(modalFromDraw&&inRoom&&mobileQuery.matches)document.querySelector('.active-head').scrollIntoView({behavior:'smooth',block:'start'});
+      modalFromDraw=false;
     }
     function inspectCard(event){
+      if(event.target.closest('.card-viewer-link'))return;
       if(event.target.closest('[data-timer-action]'))return;
       const target=event.target.closest('[data-active-index]');
       if(!target)return;
@@ -937,7 +1375,6 @@
       }
       const item=state.active[Number(target.dataset.activeIndex)];
       if(!item)return;
-      if(hasHiddenRandomResult(item.card)){requestRandomReveal(item.card.id);return;}
       openCardModal(item.card,item.phase,false);
     }
     function inspectRevealCard(event){
@@ -960,6 +1397,18 @@
       if(card)openCardModal(card,'catalog',false);
     }
     activeGrid.addEventListener('click',inspectCard);
+    activeGrid.addEventListener('click',async event=>{
+      const button=event.target.closest('[data-copy-room]');if(!button)return;
+      const value=button.dataset.copyRoom||'';
+      try{
+        if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(value);
+        else throw new Error('clipboard unavailable');
+        showToast('已复制房间号 '+value,1600);
+      }catch{
+        const area=document.createElement('textarea');area.value=value;area.setAttribute('readonly','');area.style.cssText='position:fixed;opacity:0;pointer-events:none';document.body.append(area);area.select();
+        const copied=document.execCommand('copy');area.remove();showToast(copied?'已复制房间号 '+value:'复制失败，请手动记下房间号',copied?1600:2200);
+      }
+    });
     activeGrid.addEventListener('keydown',inspectCard);
     revealCard.addEventListener('click',inspectRevealCard);
     revealCard.addEventListener('keydown',inspectRevealCard);
@@ -995,8 +1444,13 @@
     catalogModal.addEventListener('click',e=>{if(e.target===catalogModal)closeCatalog();});
     document.addEventListener('keydown',e=>{
       if(roomModal.classList.contains('open')){
-        if(e.key==='Escape')closeRoomModal();
-        if(e.key==='Tab'){e.preventDefault();roomModalSubmit.focus();}
+        if(e.key==='Escape'){e.preventDefault();if(!roomPoolOptions.hidden)closeRoomPoolOptions(true);else closeRoomModal();}
+        if(e.key==='Tab'){
+          const controls=[...roomModal.querySelectorAll('button,input,select,a[href]')].filter(el=>!el.disabled&&el.getClientRects().length);
+          const first=controls[0],last=controls.at(-1);
+          if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}
+          else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}
+        }
         return;
       }
       if(modal.classList.contains('open')){
@@ -1015,6 +1469,11 @@
       if(catalogModal.classList.contains('open')){
         if(e.key==='Escape')closeCatalog();
         if(e.key==='Tab'){e.preventDefault();$('closeCatalog').focus();}
+        return;
+      }
+      if(nodeSheet.classList.contains('open')){
+        if(e.key==='Escape')closeNodeSheet();
+        if(e.key==='Tab'){e.preventDefault();$('closeNodeSheet').focus();}
       }
     });
     $('resetBtn').addEventListener('click',resetGame);
@@ -1024,37 +1483,73 @@
     $('roomNextPage').addEventListener('click',()=>{const totalPages=Math.max(1,Math.ceil(lobbyRooms.length/ROOMS_PER_PAGE));if(roomPage<totalPages){roomPage+=1;renderRoomPage();roomList.scrollTo({top:0,behavior:'smooth'});}});
     $('closeRoomModal').addEventListener('click',closeRoomModal);
     roomModal.addEventListener('click',event=>{if(event.target===roomModal)closeRoomModal();});
+    roomPoolSelect.addEventListener('change',renderRoomPoolSummary);
+    roomPoolTrigger.addEventListener('click',()=>{if(roomPoolOptions.hidden)openRoomPoolOptions();else closeRoomPoolOptions();});
+    roomPoolOptions.addEventListener('click',event=>{const option=event.target.closest('[role="option"]');if(!option)return;roomPoolSelect.value=option.dataset.poolId;renderRoomPoolSummary();closeRoomPoolOptions(true);});
+    roomPoolPicker.addEventListener('keydown',event=>{
+      if(event.key==='Tab'){if(!roomPoolOptions.hidden)closeRoomPoolOptions(true);return;}
+      if(!['ArrowDown','ArrowUp','Home','End'].includes(event.key))return;
+      event.preventDefault();event.stopPropagation();
+      if(roomPoolOptions.hidden){openRoomPoolOptions(true);if(event.key==='ArrowDown'||event.key==='ArrowUp')return;}
+      const options=[...roomPoolOptions.querySelectorAll('[role="option"]')],current=options.indexOf(document.activeElement),index=event.key==='Home'?0:event.key==='End'?options.length-1:current<0?options.findIndex(option=>option.dataset.poolId===roomPoolSelect.value):Math.max(0,Math.min(options.length-1,current+(event.key==='ArrowDown'?1:-1)));
+      options[index]?.focus();
+    });
+    roomPoolPicker.addEventListener('focusout',event=>{if(event.relatedTarget&&!roomPoolPicker.contains(event.relatedTarget))closeRoomPoolOptions();});
+    document.addEventListener('click',event=>{if(!roomPoolPicker.contains(event.target))closeRoomPoolOptions();});
     roomModalForm.addEventListener('submit',event=>{
       event.preventDefault();
       const creating=roomModalMode==='create',id=roomModalId.value.trim(),password=roomModalPassword.value.trim();
+      if(creating&&roomPoolLoading)return;
       if(!creating&&!/^\d{4}$/.test(id)){setRoomModalError('房间号必须是 4 位数字。');return;}
       if(!/^\d{6}$/.test(password)){setRoomModalError('房间密码必须是 6 位数字。');return;}
       roomModalSubmit.disabled=true;setRoomModalError(creating?'正在创建房间…':'正在验证房间密码…');
-      const sent=sendLobbyRequest(creating?'createRoom':'joinRoom',creating?{password,poolId:$('roomPoolSelect').value}:{roomId:id,password});
+      const sent=sendLobbyRequest(creating?'createRoom':'joinRoom',creating?{password,poolId:roomPoolSelect.value}:{roomId:id,password});
       if(!sent)roomModalSubmit.disabled=false;
     });
-    $('leaveRoomBtn').addEventListener('click',()=>{
+    function leaveRoom(){
       if(!inRoom||!socket||socket.readyState!==WebSocket.OPEN)return;
       if(!confirm('确定退出当前房间吗？'))return;
       storageRemove('hexMahjongRoom');socket.send(JSON.stringify({type:'leaveRoom'}));
-    });
+    }
+    $('leaveRoomBtn').addEventListener('click',leaveRoom);
+    $('mLeaveBtn').addEventListener('click',leaveRoom);
+    $('mResetBtn').addEventListener('click',resetGame);
+    $('mDrawBtn').addEventListener('click',draw);
+    $('mCodexBtn').addEventListener('click',openCatalog);
+    $('mNodesBtn').addEventListener('click',openNodeSheet);
+    $('mTrack').addEventListener('click',openNodeSheet);
+    $('closeNodeSheet').addEventListener('click',closeNodeSheet);
+    nodeSheet.addEventListener('click',event=>{if(event.target===nodeSheet)closeNodeSheet();});
+    // 跨过手机断点时重排场地效果（手机端最新在前），并收起只属于手机端的节点面板。
+    mobileQuery.addEventListener('change',()=>{if(!mobileQuery.matches)closeNodeSheet();render();});
+    $('mHistoryBtn').addEventListener('click',()=>document.querySelector('.side-panel').scrollIntoView({behavior:'smooth',block:'start'}));
     function setSyncStatus(text,status){
       const el=$('syncStatus');el.textContent=text;el.className='sync-status '+(status||'');
+      $('mSyncText').textContent=text;$('mSync').className='m-sync '+(status||'');
     }
     function connectSync(){
       const protocol=location.protocol==='https:'?'wss:':'ws:';
       const basePath=location.pathname.startsWith('/hex-mahjong')?'/hex-mahjong/':'';
       const endpoint=(location.protocol==='file:'?'ws://'+(location.hostname||'127.0.0.1')+':3000':protocol+'//'+location.host+basePath);
+      const previousSocket=socket;
       try{socket=new WebSocket(endpoint);}catch(error){setSyncStatus('同步不可用','offline');return;}
+      const connection=socket;let replaced=false;previousSocket?.close();
       socket.addEventListener('open',()=>{
+        if(socket!==connection)return;
         syncReady=true;setSyncStatus(inRoom?'已同步':'已连接大厅','online');
         let resume=null;try{resume=JSON.parse(storageGet('hexMahjongRoom','null'));}catch{resume=null;}
         socket.send(JSON.stringify({type:'hello',clientId,...(resume?.roomId&&resume?.memberToken?{roomId:resume.roomId,memberToken:resume.memberToken}:{})}));
-        $('createRoomActionBtn').disabled=false;$('joinRoomActionBtn').disabled=false;roomModalSubmit.disabled=false;render();
+        $('createRoomActionBtn').disabled=false;$('joinRoomActionBtn').disabled=false;roomModalSubmit.disabled=roomModalMode==='create'&&roomPoolLoading;render();
       });
       socket.addEventListener('message',event=>{
+        if(socket!==connection)return;
         let message;try{message=JSON.parse(event.data);}catch{return;}
         syncServerClock(message.serverTime);
+        if(message.type==='sessionReplaced'){
+          replaced=true;syncReady=false;
+          // Keep the shared recovery record for the new page; this page stops reconnecting.
+          closeModal({returnToCatalog:false,advanceSettlement:false});showLobby(message.reason||'房间已在另一页面打开。');setSyncStatus('另一页面已接管','offline');return;
+        }
         if(message.type==='lobby'){
           renderRoomList(message.rooms||[]);
           if(message.notice&&(!inRoom||message.notice.includes('失效')||message.notice.includes('删除')||message.notice.includes('退出'))){
@@ -1069,13 +1564,14 @@
           storageRemove('hexMahjongRoom');showLobby(message.reason||'已退出房间');return;
         }
         if(message.type==='roomPresence'){
-          roomInfo=message.room||roomInfo;return;
+          roomInfo=message.room||roomInfo;render();return;
         }
         if(message.type==='roomClosed'){
           storageRemove('hexMahjongRoom');showLobby(message.reason||'房间已关闭');showToast(message.reason||'房间已关闭',2600);return;
         }
         if(message.type==='state'||message.type==='reset'||message.type==='settlement'||message.type==='drawn'||message.type==='revealed'||message.type==='timer'){
           if(message.state)state=message.state;
+          if(message.type==='reset'||message.type==='settlement')roomInviteVisible=false;
           state.active=state.active.map(item=>({...item,card:resolveCard(item.card)}));
           render();
           if(message.type==='drawn'){
@@ -1090,6 +1586,7 @@
               showToast('其他玩家抽取了「'+message.card.name+'」'+bonusLabel+nextLabel,2600);
             }
             if(message.card.id==='R04')showToast('静水监狱：本局后续海克斯抽取已锁定',message.drawnBy===clientId?2600:2000);
+            if(message.card.id==='R01')showToast('双人成行：本局后续海克斯抽取已锁定',message.drawnBy===clientId?2600:2000);
             if(message.card.id==='P42')showToast('谁能笑到最后：本局后续海克斯抽取已锁定',message.drawnBy===clientId?2600:2000);
             if(message.card.id==='R03')showToast('大逃杀：本局后续海克斯抽取已锁定',message.drawnBy===clientId?2600:2000);
           }
@@ -1097,18 +1594,16 @@
             openCardModal(message.card,message.phase,false);
             $('modalTitle').textContent='随机结果已揭晓 · '+message.card.name;
           }
-          if(message.type==='reset'){closeModal({returnToCatalog:false});closeCatalog();showToast('本局已重置');}
+          if(message.type==='reset'){closeModal({returnToCatalog:false,advanceSettlement:false});closeCatalog();showToast('本局已重置');}
           if(message.type==='settlement'){
-            closeModal({returnToCatalog:false});closeCatalog();
-            if(message.triggered&&message.card){
-              openCardModal(message.card,'settlement',true);
-              $('modalTitle').textContent='棱彩奇迹降临 · 败者食尘';
-              $('closeModal').textContent='接受奇迹，进入下一局';
-            }else showToast('本局已结算，已进入下一局',2600);
+            closeModal({returnToCatalog:false,advanceSettlement:false});closeCatalog();
+            const settlementCards=Array.isArray(message.cards)?message.cards:(Array.isArray(message.settlementCards)?message.settlementCards:(message.card?[message.card]:[]));
+            if(message.triggered&&settlementCards.length)openSettlementModal(settlementCards);
+            else showToast('本局已结算，已进入下一局',2600);
           }
         }else if(message.type==='error'){
           $('createRoomActionBtn').disabled=false;$('joinRoomActionBtn').disabled=false;roomModalSubmit.disabled=false;
-          if(['BAD_PASSWORD','JOIN_LOCKED','ROOM_NOT_FOUND','INVALID_ROOM_ID','INVALID_PASSWORD','ROOM_FULL','ROOM_LIMIT','CREATE_LIMIT','LOGIN_REQUIRED','POOL_NOT_FOUND','POOL_INVALID'].includes(message.code)){
+          if(roomModal.classList.contains('open')){
             setRoomModalError(message.message||'加入房间失败。');
             setLobbyStatus(message.message||'加入房间失败。',true);
           }
@@ -1116,10 +1611,9 @@
           render();
         }
       });
-      socket.addEventListener('close',()=>{syncReady=false;setSyncStatus('同步断开','offline');$('createRoomActionBtn').disabled=true;$('joinRoomActionBtn').disabled=true;roomModalSubmit.disabled=true;render();setTimeout(()=>{if(!syncReady)connectSync();},1800);});
-      socket.addEventListener('error',()=>setSyncStatus('同步错误','offline'));
+      socket.addEventListener('close',event=>{if(socket!==connection)return;syncReady=false;setSyncStatus(replaced||event.code===4001?'另一页面已接管':'同步断开','offline');$('createRoomActionBtn').disabled=true;$('joinRoomActionBtn').disabled=true;roomModalSubmit.disabled=true;render();if(!replaced&&event.code!==4001)setTimeout(()=>{if(socket===connection&&!syncReady)connectSync();},1800);});
+      socket.addEventListener('error',()=>{if(socket===connection)setSyncStatus('同步错误','offline');});
     }
-    loadLobbyAccount();
     connectSync();
     render();
     setInterval(updateTimerUi,100);

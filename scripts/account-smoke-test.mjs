@@ -88,16 +88,34 @@ try{
     {id:'win_b',name:'第二家胡牌',description:'第四步',type:'afterWin'},
     {id:'finale',name:'终盘',description:'第五步',type:'lateGame'}
   ];
-  const fiveCards=[openingA,openingB,afterA,afterB,late].map(card=>({source:'private',id:card.id,assignmentMode:'auto',nodeIds:[]}));
+  const fiveCards=[
+    {source:'private',id:openingA.id,assignmentMode:'custom',nodeIds:['open_a']},
+    {source:'private',id:openingB.id,assignmentMode:'custom',nodeIds:['open_b']},
+    {source:'private',id:afterA.id,assignmentMode:'custom',nodeIds:['win_a']},
+    {source:'private',id:afterB.id,assignmentMode:'custom',nodeIds:['win_b']},
+    {source:'private',id:late.id,assignmentMode:'custom',nodeIds:['finale']}
+  ];
   const fivePool=await api('/api/pools',{method:'POST',cookie,csrf,body:{name:'五节点测试池',description:'最多五个节点',nodes:fiveNodes,cards:fiveCards}});
   assert.equal(fivePool.status,201,fivePool.data.message);assert.equal(fivePool.data.pool.nodes.length,5);
   const sixPool=await api('/api/pools',{method:'POST',cookie,csrf,body:{name:'六节点非法池',description:'',nodes:[...fiveNodes,{id:'too_many',name:'多余节点',description:'',type:'custom'}],cards:fiveCards}});
   assert.equal(sixPool.status,400);assert.equal(sixPool.data.error,'INVALID_NODE_COUNT');
 
   const threeNodes=[fiveNodes[0],fiveNodes[2],fiveNodes[4]];
-  const threeCards=[openingA,afterA,late].map(card=>({source:'private',id:card.id,assignmentMode:'auto',nodeIds:[]}));
+  const threeCards=[
+    {source:'private',id:openingA.id,assignmentMode:'custom',nodeIds:['open_a']},
+    {source:'private',id:afterA.id,assignmentMode:'custom',nodeIds:['win_a']},
+    {source:'private',id:late.id,assignmentMode:'custom',nodeIds:['finale']}
+  ];
   const threePool=await api('/api/pools',{method:'POST',cookie,csrf,body:{name:'三节点私人池',description:'房间同步测试',nodes:threeNodes,cards:threeCards}});
   assert.equal(threePool.status,201,threePool.data.message);
+  const guestChoices=await api('/api/room-pools');
+  assert.equal(guestChoices.status,200);assert.equal(guestChoices.data.user,null);assert.equal(guestChoices.data.pools.length,1);
+  assert.equal(guestChoices.headers['cache-control'],'private, no-store');
+  assert.equal(guestChoices.data.pools[0].id,'');assert.equal(guestChoices.data.pools[0].nodes.length,3);
+  const ownerChoices=await api('/api/room-pools',{cookie});
+  assert.deepEqual(ownerChoices.data.pools.map(pool=>pool.id).filter(Boolean).sort(),[fivePool.data.pool.id,threePool.data.pool.id].sort());
+  const choice=ownerChoices.data.pools.find(pool=>pool.id===threePool.data.pool.id);
+  assert.equal(choice.cardCount,3);assert.equal(choice.drawCount,3);assert.ok(!Object.hasOwn(choice,'cards'));assert.ok(!Object.hasOwn(ownerChoices.data,'csrfToken'));
 
   const revoked=await connect(newPasswordLogin.cookie);revoked.send(JSON.stringify({type:'hello',clientId:'revoked-session'}));
   const loggedOut=await api('/api/auth/logout',{method:'POST',cookie:newPasswordLogin.cookie,csrf:newPasswordLogin.data.csrfToken,body:{}});assert.equal(loggedOut.status,200);
@@ -106,6 +124,10 @@ try{
   const second=await api('/api/auth/register',{method:'POST',body:{username:'另一位玩家',password:'another-password-2026'}});
   assert.equal(second.status,201);const secondCards=await api('/api/private-cards',{cookie:second.cookie});const secondPools=await api('/api/pools',{cookie:second.cookie});
   assert.deepEqual(secondCards.data.cards,[]);assert.deepEqual(secondPools.data.pools,[]);
+  const otherChoices=await api('/api/room-pools',{cookie:second.cookie});assert.equal(otherChoices.data.pools.length,1);
+  const otherOwner=await connect(second.cookie);otherOwner.send(JSON.stringify({type:'hello',clientId:'other-owner'}));
+  const forbiddenPool=await sendAndWait(otherOwner,{type:'createRoom',password:'123456',poolId:threePool.data.pool.id},message=>message.type==='error');
+  assert.equal(forbiddenPool.code,'POOL_NOT_FOUND');otherOwner.close();
 
   const visitor=await connect();visitor.send(JSON.stringify({type:'hello',clientId:'visitor'}));
   const loginRequired=await sendAndWait(visitor,{type:'createRoom',password:'123456',poolId:threePool.data.pool.id},message=>message.type==='error');
@@ -117,6 +139,10 @@ try{
   assert.ok(created.config.cards.every(card=>card.custom));
   const joined=await sendAndWait(visitor,{type:'joinRoom',roomId:created.roomId,password:'123456'},message=>message.type==='roomJoined');
   assert.deepEqual(joined.config,created.config);
+  const changedPool=await api('/api/pools/'+threePool.data.pool.id,{method:'PUT',cookie,csrf,body:{name:'修改后的私人池',description:'已创建的房间保留旧快照',nodes:threeNodes,cards:[{...threeCards[0],id:openingB.id},...threeCards.slice(1)]}});
+  assert.equal(changedPool.status,200,changedPool.data.message);
+  const resetRoom=await sendAndWait(owner,{type:'reset',roundId:created.state.roundId},message=>message.type==='reset');
+  assert.equal(resetRoom.state.phase,'open_a');
 
   const outOfOrder=await sendAndWait(owner,{type:'draw',phase:'win_a'},message=>message.type==='error');assert.equal(outOfOrder.code,'PHASE_NOT_ALLOWED');
   const first=await sendAndWait(owner,{type:'draw',phase:'open_a'},message=>message.type==='drawn');assert.equal(first.card.id,openingA.id);assert.equal(first.state.phase,'win_a');
@@ -125,5 +151,5 @@ try{
   const settlement=await sendAndWait(owner,{type:'settle',roundId:third.state.roundId},message=>message.type==='settlement');assert.equal(settlement.triggered,false);
 
   owner.close();visitor.close();
-  console.log(JSON.stringify({registration:true,login:true,passwordChange:true,otherSessionsRevoked:true,csrf:true,revokedSessionBlocked:true,privateIsolation:true,fiveNodes:true,sixNodesRejected:true,privatePoolRoom:true,guestConfigSync:true,nodeOrder:true,noSettlementCardMeansNoTrigger:true}));
+  console.log(JSON.stringify({registration:true,login:true,passwordChange:true,otherSessionsRevoked:true,csrf:true,revokedSessionBlocked:true,privateIsolation:true,fiveNodes:true,sixNodesRejected:true,roomPoolChoices:true,otherUsersPoolBlocked:true,privatePoolRoom:true,guestConfigSync:true,roomSnapshotAndReset:true,nodeOrder:true,noSettlementCardMeansNoTrigger:true}));
 }finally{stop();}

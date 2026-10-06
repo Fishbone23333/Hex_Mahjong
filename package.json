@@ -6,18 +6,26 @@
   "scripts": {
     "start": "node server.mjs",
     "test:security": "node scripts/security-smoke-test.mjs",
-    "test:settlement": "node scripts/settlement-smoke-test.mjs",
+    "test:rooms": "node scripts/room-lifecycle-smoke-test.mjs",
+    "test:settlement": "node scripts/settlement-smoke-test.mjs && node scripts/settlement-soul-smoke-test.mjs && node scripts/settlement-both-smoke-test.mjs",
     "test:timer": "node scripts/timer-smoke-test.mjs",
     "test:battle-royale": "node scripts/battle-royale-smoke-test.mjs",
     "test:conflicts": "node scripts/conflict-smoke-test.mjs",
     "test:recent-cards": "node scripts/recent-card-smoke-test.mjs",
     "test:accounts": "node scripts/account-smoke-test.mjs",
-    "test": "npm run test:conflicts && npm run test:recent-cards && npm run test:battle-royale && npm run test:timer && npm run test:security && npm run test:settlement && npm run test:accounts"
+    "test:email": "node scripts/email-recovery-test.mjs",
+    "test:hardening": "node scripts/hardening-regression-test.mjs",
+    "test:production": "node scripts/production-config-test.mjs",
+    "test:backup": "node scripts/backup-restore-test.mjs",
+    "backup": "node scripts/backup-database.mjs",
+    "release:prepare": "node scripts/prepare-release.mjs",
+    "test": "npm run test:conflicts && npm run test:recent-cards && npm run test:battle-royale && npm run test:timer && npm run test:security && npm run test:rooms && npm run test:settlement && npm run test:accounts && npm run test:email && npm run test:hardening && npm run test:production && npm run test:backup"
   },
   "engines": {
-    "node": ">=22.5.0"
+    "node": ">=22.16.0"
   },
   "dependencies": {
+    "nodemailer": "^10.0.15",
     "ws": "^8.18.3"
   }
 }

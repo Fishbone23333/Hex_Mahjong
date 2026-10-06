@@ -5,7 +5,7 @@ import WebSocket from 'ws';
 const port=3201,origin=`http://127.0.0.1:${port}`;
 const server=spawn(process.execPath,['server.mjs'],{
   cwd:new URL('..',import.meta.url),
-  env:{...process.env,PORT:String(port),SETTLEMENT_TRIGGER_RATE:'1',HEX_DB_PATH:':memory:',NODE_NO_WARNINGS:'1'},
+  env:{...process.env,PORT:String(port),SETTLEMENT_TRIGGER_RATE:'1',SOUL_TRANSFER_TRIGGER_RATE:'0',HEX_DB_PATH:':memory:',NODE_NO_WARNINGS:'1'},
   stdio:['ignore','pipe','pipe']
 });
 const stop=()=>{if(!server.killed)server.kill();};
@@ -53,6 +53,7 @@ try{
   assert.equal(bypass.code,'USE_SETTLEMENT');
   const settlement=await sendAndWait(owner,{type:'settle',roundId:previousRoundId},message=>message.type==='settlement');
   assert.equal(settlement.triggered,true);
+  assert.deepEqual(settlement.cards.map(card=>card.id),['R06']);
   assert.equal(settlement.card?.id,'R06');
   assert.equal(settlement.card?.effect,'本局损失筹码最多的玩家(们)的结算作废。');
   assert.notEqual(settlement.state.roundId,previousRoundId);

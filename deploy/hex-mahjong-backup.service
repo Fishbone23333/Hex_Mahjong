@@ -1,0 +1,17 @@
+[Unit]
+Description=Consistent Hex Mahjong SQLite backup
+
+[Service]
+Type=oneshot
+User=hex-mahjong
+Group=hex-mahjong
+EnvironmentFile=/etc/hex-mahjong.env
+Environment=HEX_BACKUP_DIR=/var/backups/hex-mahjong
+WorkingDirectory=/opt/hex-mahjong
+ExecStart=/usr/bin/node /opt/hex-mahjong/scripts/backup-database.mjs
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/hex-mahjong /var/backups/hex-mahjong
