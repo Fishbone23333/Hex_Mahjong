@@ -30,6 +30,29 @@
 
 海克斯是场地效果，不属于某一位玩家。房间内任何人抽到卡牌后，所有玩家都会实时看到相同的效果，避免每个人维护一套复杂的个人卡牌。
 
+下面是 12 张代表性海克斯的图鉴卡面截图，涵盖万能牌、换牌、规则改写、限制效果和结算奇迹。点击图片可查看原图。
+
+<table>
+  <tr>
+    <td width="25%"><a href="docs/images/hexes/p01.png"><img src="docs/images/hexes/p01.png" alt="百变财神：随机指定一种万能牌" width="240"></a></td>
+    <td width="25%"><a href="docs/images/hexes/p16.png"><img src="docs/images/hexes/p16.png" alt="换五乾坤：换三张升级为换五张" width="240"></a></td>
+    <td width="25%"><a href="docs/images/hexes/p21.png"><img src="docs/images/hexes/p21.png" alt="天堂制造：除碰牌外，摸牌和弃牌重复一次" width="240"></a></td>
+    <td width="25%"><a href="docs/images/hexes/p31.png"><img src="docs/images/hexes/p31.png" alt="火力全开：额外抽取三张海克斯，四张效果同时生效" width="240"></a></td>
+  </tr>
+  <tr>
+    <td width="25%"><a href="docs/images/hexes/p34.png"><img src="docs/images/hexes/p34.png" alt="镜像世界：同门牌的镜像点数可以互相替代" width="240"></a></td>
+    <td width="25%"><a href="docs/images/hexes/p38.png"><img src="docs/images/hexes/p38.png" alt="命运轮转：将整副手牌传给左手边玩家" width="240"></a></td>
+    <td width="25%"><a href="docs/images/hexes/n01.png"><img src="docs/images/hexes/n01.png" alt="明牌：所有玩家的手牌公开摆放" width="240"></a></td>
+    <td width="25%"><a href="docs/images/hexes/n06.png"><img src="docs/images/hexes/n06.png" alt="定缺天谴：系统随机指定定缺门" width="240"></a></td>
+  </tr>
+  <tr>
+    <td width="25%"><a href="docs/images/hexes/r02.png"><img src="docs/images/hexes/r02.png" alt="无限火力：八秒回合内可重复摸打一轮" width="240"></a></td>
+    <td width="25%"><a href="docs/images/hexes/r03.png"><img src="docs/images/hexes/r03.png" alt="大逃杀：六十秒自由摸打，按胡牌顺序瓜分奖池" width="240"></a></td>
+    <td width="25%"><a href="docs/images/hexes/r04.png"><img src="docs/images/hexes/r04.png" alt="静水监狱：只能自摸，首位胡牌者加四番并结束本局" width="240"></a></td>
+    <td width="25%"><a href="docs/images/hexes/r06.png"><img src="docs/images/hexes/r06.png" alt="败者食尘：结算时概率触发，最大损失者结算作废" width="240"></a></td>
+  </tr>
+</table>
+
 默认官方卡池使用三个抽取节点：
 
 | 节点 | 触发时机 |
