@@ -95,6 +95,21 @@
 
 私人卡牌只属于创建者，不会进入公共图鉴。私人卡池进入房间时会被冻结为一份规则快照，因此之后修改卡池不会改变已经开始的牌局。
 
+下面是 DIY 工坊的手机端截图：上方实时预览卡面，下方按分类填写信息；卡池可以自定义抽取节点，并混合选择官方卡牌与自己的海克斯。截图中的卡牌和卡池为演示内容，点击图片可查看原图。
+
+<table>
+  <tr>
+    <th width="33%">DIY 卡牌 · 实时预览</th>
+    <th width="33%">DIY 卡池 · 抽取节点</th>
+    <th width="33%">DIY 卡池 · 选择海克斯</th>
+  </tr>
+  <tr>
+    <td><a href="docs/images/studio/diy-card.png"><img src="docs/images/studio/diy-card.png" alt="手机端 DIY 卡牌编辑器：实时卡面预览、卡面信息、图标预设与保存按钮" width="260"></a></td>
+    <td><a href="docs/images/studio/diy-pool-nodes.png"><img src="docs/images/studio/diy-pool-nodes.png" alt="手机端 DIY 卡池编辑器：设置抽取节点名称、类型与顺序，最多五个节点" width="260"></a></td>
+    <td><a href="docs/images/studio/diy-pool-cards.png"><img src="docs/images/studio/diy-pool-cards.png" alt="手机端 DIY 卡池选卡界面：混合选择官方卡牌与自己的海克斯，并设置 DIY 卡牌出现节点" width="260"></a></td>
+  </tr>
+</table>
+
 ### 结算奇迹与重复率控制
 
 “败者食尘”“灵魂转移”属于结算时判定的特殊海克斯，不会混入三个普通节点的抽卡池。它们在点击结算时由服务器按各自概率统一判定，结果同步给全房间。
